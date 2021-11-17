@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue2</title>
+</head>
+<style>
+    ul {
+        list-style: none;
+    }
+
+    p {
+        padding-left: 10px;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="app" v-cloak>
+        <!-- <h1 v-bind:title="title">{{ title }}</h1> -->
+        <ul>
+            <li v-for="(item,index) in list" :key="index">
+                <h3>{{item.title}}</h3>
+                <div v-for="(child,childIndex) in item.children" :key="childIndex">
+                    <h5>{{ child.name }}</h5>
+                    <component :is="item.component" />
+                </div>
+            </li>
+        </ul>
+    </div>
+</body>
+<script src="./vue2.js"></script>
+<script type="module">
+    import InstanceComponent from './components/InstanceComponent.js'
+    import TemplateComponent from './components/TemplateComponent.js'
+    import EventComponent from './components/EventComponent.js'
+    const app = new Vue({
+        el: '#app',
+        components: {
+            InstanceComponent,
+            TemplateComponent,
+            EventComponent
+        },
+        data() {
+            return {
+                title: 'Vue2',
+                list: [{
+                        title: 'Vue实例',
+                        component: InstanceComponent,
+                        children: [{
+                            name: '数据与方法'
+                        }]
+                    },
+                    {
+                        title: '模板语法',
+                        component: TemplateComponent,
+                        children: [{
+                            name: '属性'
+                        }]
+                    },
+                    {
+                        title: '事件处理',
+                        component: EventComponent,
+                        children: [{
+                            name: '多时间处理器'
+                        }]
+                    }
+                ]
+            }
+        },
+        beforeCreate() {
+            console.log(this)
+            console.log('父组件beforeCreate')
+        },
+        created() {
+            console.log(this)
+            console.log('父组件created')
+        },
+        mounted() {
+            console.log(this)
+            console.log('父组件mounted')
+        },
+        beforeUpdate() {
+            console.log(this)
+            console.log('父组件beforeUpdate')
+        },
+        updated() {
+            console.log(this)
+            console.log('父组件updated')
+        },
+        beforeDestroy() {
+            console.log(this)
+            console.log('父组件beforeDestroy')
+        },
+        destroyed() {
+            console.log(this)
+            console.log('父组件destroyed')
+        }
+    })
+</script>
+
+</html>

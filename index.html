@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <h2>{{ title }}</h2>
+        <div class="module">
+            <p class="title">props</p>
+            <props-component></props-component>
+        </div>
+        <div class="module">
+            <p class="title">自定义事件</p>
+            <model-value-component v-model="inputValue"></model-value-component>
+            <p>输入值： {{ inputValue }}</p>
+        </div>
+        <div class="module">
+            <p class="title">插槽</p>
+            <slot-component>
+                插槽 {{ title }}
+            </slot-component>
+        </div>
+        <div class="module">
+            <p class="title" @click="title = 'Vue3知识点'">Provide/inject</p>
+            <parent-component></parent-component>
+        </div>
+        <div class="module">
+            <p class="title">动态组件</p>
+            <dynamic-component></dynamic-component>
+        </div>
+    </div>
+</body>
+<script src="./vue.js"></script>
+<script>
+    // vue
+    const PropsItemComponent = {
+        name: 'PropsItemComponent',
+        // props: ['name', 'gender', 'first', 'second'],
+        props: {
+            name: {
+                type: [Number, String]
+            },
+            gender: {
+                type: String
+            }
+        },
+        emits: {
+            handleSendName: (name) => {
+                if (name){
+                    return true
+                } else {
+                    return false
+                }
+            }
+        },
+        methods: {
+            sendName(name) {
+                this.$emit('handleSendName', name)
+            }
+        },
+        template: `
+            <p @click="sendName(name)">{{ name }} ： {{ gender }}</p>
+        `
+    }
+    const PropsComponent = {
+        name: 'PropsComponent',
+        components: {
+            PropsItemComponent
+        },
+        data() {
+            return {
+                poems: [
+                    {
+                        name: '李白',
+                        gender: '男'
+                    }, {
+                        name: '李清照',
+                        gender: '女'
+                    }
+                ],
+                listHead: {
+                    'first': '姓名',
+                    'second': 'x性别'
+                }
+            }
+        },
+        methods: {
+            handleSendName(name) {
+                console.log(name)
+            }
+        },
+        template: `
+        <div>
+            <props-item-component
+                v-for="item in poems"
+                class="aaa"
+                :key="item.name"
+                @handleSendName="handleSendName"
+                v-bind="item">
+            </props-item-component>
+        </div>
+        `
+    }
+    const ModelValueComponent = {
+        name: 'modelValueComponent',
+        props: ['modelValue'],
+        emits: ['update:modelValue'],
+        template: `<p><input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" /></p>`
+    }
+    const CapitalizeComponent = {
+        name: 'CapitalizeComponent',
+        template: `<input />`
+    }
+    // 插槽
+    const TodoList = {
+        name: 'TodoList',
+        data() {
+            return {
+                items: [
+                    {
+                        time: '7:00',
+                        task: '起床'
+                    }
+                ]
+            }
+        },
+        template: `
+          <ul>
+            <li v-for="item in items" :key="item"> <slot :item="item"></slot> </li>
+          </ul>
+        `
+    }
+    const SlotComponent = {
+        name: 'SlotComponent',
+        components: {
+            TodoList
+        },
+        template: `
+          <p>
+            <slot></slot>
+          <todo-list #default="{item}">
+            <span> {{ item }} </span>
+          </todo-list>
+          </p>
+        `
+    }
+    // Provide/inject
+    const injectComponent = {
+        name: 'injectComponent',
+        inject: ['title'],
+        // computed: {
+        //     provide() {
+        //         return 'app provide-' + this.title
+        //     }
+        // },
+        template:`
+            <p>Injected property：{{ this.title.value }}</p>
+        `
+    }
+    const ParentComponent = {
+        name: 'ParentComponent',
+        components: {
+            injectComponent
+        },
+        template:`
+            <p><inject-component></inject-component></p>
+        `
+    }
+    // 动态组件
+    const LoginByName = {
+        name: 'LoginByName',
+        data() {
+            return {
+                name: ''
+            }
+        },
+        template: `<input v-model="name" placeholder="请输入姓名" />`
+    }
+    const LoginByEmail = {
+        name: 'LoginByEmail',
+        data() {
+            return {
+                email: ''
+            }
+        },
+        template: `<input v-model="email" placeholder="请输入email"/>`
+    }
+    const DynamicComponent = {
+        name: 'DynamicComponent',
+        components: {
+            LoginByName,
+            LoginByEmail
+        },
+        data() {
+            return {
+                loginType: 'Name',
+                tabs: [
+                    {
+                        label: '姓名',
+                        type: 'Name'
+                    },
+                    {
+                        label: 'email',
+                        type: 'Email'
+                    }
+                ]
+            }
+        },
+        template: `
+            <div>
+              登录方式：
+              <p>
+                <button class="tab-item" v-for="item in tabs" :key="item.label" @click="loginType = item.type">{{ item.label }}</button>
+              </p>
+              <p>
+                <component :is="'LoginBy' + loginType"></component>
+              </p>
+            </div>
+        `
+    }
+
+    // app
+    const App = {
+        name: 'App',
+        provide(){
+            return {
+                // title: this.title
+                title: Vue.computed(()=> this.title)
+            }
+        },
+        components: {
+            PropsComponent,
+            ModelValueComponent,
+            SlotComponent,
+            ParentComponent,
+            DynamicComponent
+        },
+        data () {
+            return {
+                title: 'Vue3',
+                inputValue: ''
+            }
+        }
+    }
+    Vue.createApp(App).mount('#app')
+</script>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    h2{
+        text-align: center;
+    }
+    #app{
+        padding:8px;
+    }
+    div.module + div.module{
+        margin-top: 20px;
+    }
+    .title::before{
+        content: '#';
+        color: #3eaf7c;
+    }
+    .tab-item + .tab-item {
+        margin-left: 5px;
+    }
+</style>
+</html>
