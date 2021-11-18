@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue2</title>
 </head>
 <style>
@@ -18,6 +18,14 @@
 
     [v-cloak] {
         display: none;
+    }
+
+    .inputClass {
+        border: 1px solid #3e96f0;
+    }
+
+    .formControl {
+        border: 1px solid #3e3e;
     }
 </style>
 
@@ -37,72 +45,90 @@
 </body>
 <script src="./vue2.js"></script>
 <script type="module">
-    import InstanceComponent from './components/InstanceComponent.js'
-    import TemplateComponent from './components/TemplateComponent.js'
-    import EventComponent from './components/EventComponent.js'
+    import InstanceComponent from "./components/InstanceComponent.js";
+    import TemplateComponent from "./components/TemplateComponent.js";
+    import EventComponent from "./components/EventComponent.js";
+    import PropComponent from "./components/PropComponent.js";
     const app = new Vue({
-        el: '#app',
+        el: "#app",
         components: {
             InstanceComponent,
             TemplateComponent,
-            EventComponent
+            EventComponent,
+            PropComponent,
         },
         data() {
             return {
-                title: 'Vue2',
-                list: [{
-                        title: 'Vue实例',
+                title: "Vue2",
+                list: [
+                    {
+                        title: "Vue实例",
                         component: InstanceComponent,
-                        children: [{
-                            name: '数据与方法'
-                        }]
+                        children: [
+                            {
+                                name: "数据与方法",
+                            },
+                        ],
                     },
                     {
-                        title: '模板语法',
+                        title: "模板语法",
                         component: TemplateComponent,
-                        children: [{
-                            name: '属性'
-                        }]
+                        children: [
+                            {
+                                name: "属性",
+                            },
+                        ],
                     },
                     {
-                        title: '事件处理',
+                        title: "事件处理",
                         component: EventComponent,
-                        children: [{
-                            name: '多时间处理器'
-                        }]
-                    }
-                ]
-            }
+                        children: [
+                            {
+                                name: "多时间处理器",
+                            },
+                        ],
+                    },
+                    {
+                        title: "Prop",
+                        component: PropComponent,
+                        children: [
+                            {
+                                name: "非Prop的Attribute",
+                            },
+                        ],
+                    },
+                ],
+            };
         },
         beforeCreate() {
-            console.log(this)
-            console.log('父组件beforeCreate')
+            console.log(this);
+            console.log("父组件beforeCreate");
         },
         created() {
-            console.log(this)
-            console.log('父组件created')
+            console.log(this);
+            console.log("父组件created");
         },
         mounted() {
-            console.log(this)
-            console.log('父组件mounted')
+            console.log(this);
+            console.log("父组件mounted");
         },
         beforeUpdate() {
-            console.log(this)
-            console.log('父组件beforeUpdate')
+            console.log(this);
+            console.log("父组件beforeUpdate");
         },
         updated() {
-            console.log(this)
-            console.log('父组件updated')
+            console.log(this);
+            console.log("父组件updated");
         },
         beforeDestroy() {
-            console.log(this)
-            console.log('父组件beforeDestroy')
+            console.log(this);
+            console.log("父组件beforeDestroy");
         },
         destroyed() {
-            console.log(this)
-            console.log('父组件destroyed')
-        }
-    })
+            console.log(this);
+            console.log("父组件destroyed");
+        },
+    });
 </script>
 
 </html>
