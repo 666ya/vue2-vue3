@@ -20,6 +20,11 @@ const PropInput = {
 const BaseInput = {
     name: 'BaseInput',
     props: ['value'],
+    // methods: {
+    //     showInputValue(event) {
+    //         console.log(event.target.value)
+    //     }
+    // },
     template: `h
     <input v-bind:value="value" @change="$emit('input',$event.target.value)"/>
     `
@@ -48,21 +53,23 @@ const BaseRadio = {
 }
 const template = `
     <div>
-       <propInput label="姓名" type="text" placeholder="请输入姓名"></propInput>
-       <baseRadio v-model="radioChecked"></baseRadio>
+    aaa
+    //    <propInput label="姓名" type="text" placeholder="请输入姓名"></propInput>
+    //    <base-input v-model="baseInputValue" @input="showInputValue"></base-input>
     </div>
     `
 export default {
     name: 'PropComponent',
     components: {
-        PropInput,
-        BaseInput,
+        // PropInput,
+        // BaseInput,
         BaseRadio
     },
     data() {
         return {
+            baseInputValue: 'baseInputValue',
             inputValue: '测试',
-            radioChecked: true
+            radioChecked: '男'
         }
     },
     template

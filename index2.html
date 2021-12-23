@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vue2</title>
+    <title></title>
 </head>
 <style>
     ul {
@@ -27,39 +27,374 @@
     .formControl {
         border: 1px solid #3e3e;
     }
+
+    .test {
+        font-size: 12px;
+        width: 50px;
+    }
+
+    .info {
+        position: relative;
+    }
+
+    .zan+.info::before {
+        position: absolute;
+        content: '';
+        width: 100%;
+        border: 1px solid #000;
+    }
 </style>
 
 <body>
     <div id="app" v-cloak>
-        <!-- <h1 v-bind:title="title">{{ title }}</h1> -->
-        <ul>
-            <li v-for="(item,index) in list" :key="index">
-                <h3>{{item.title}}</h3>
-                <div v-for="(child,childIndex) in item.children" :key="childIndex">
-                    <h5>{{ child.name }}</h5>
-                    <component :is="item.component" />
-                </div>
-            </li>
-        </ul>
+        <shopping-cart></shopping-cart>
+        <template v-if="!showShopping">
+            <!-- <h1 v-bind:title="title">{{ title }}</h1> -->
+            <div class="test">
+                <div class="zan">点赞</div>
+                <div class="info">评论</div>
+            </div>
+            <ul>
+                <li v-for="(item,index) in list" :key="index">
+                    <h3 @click="handleClickFn">{{item.title}}</h3>
+                    <div v-for="(child,childIndex) in item.children" :key="childIndex">
+                        <h5>{{ child.name }}</h5>
+                        <component :is="item.component" />
+                    </div>
+                </li>
+                <li>
+                    <h3>全局组件</h3>
+                    <div>
+                        <vue-component></vue-component>
+                    </div>
+                </li>
+            </ul>
+            <!-- <slot-component>
+            <template #header>
+                <h2>头部标题</h2>
+            </template>
+            <template v-slot:main>
+                <p>主要内容</p>
+            </template>
+            <template #default="slotProps">
+                {{ slotProps.user.name }}
+            </template>
+        </slot-component> -->
+        </template>
     </div>
 </body>
 <script src="./vue2.js"></script>
+<script src="./vuex.js"></script>
+<script type="text/x-template" id="vueTemplate">
+    <div>
+        <p @click="handleClick">{{title}}可点击</p>
+        <p>${msg}</p>
+    </div>
+</script>
+<script>
+    const app = {
+        state: {
+            count: 0,
+            title: '未命名空间',
+            list: [{
+                    id: 1,
+                    text: 'app三国演义',
+                    done: false
+                },
+                {
+                    id: 2,
+                    text: 'app红楼梦',
+                    done: true
+                },
+                {
+                    id: 3,
+                    text: 'app西游记',
+                    done: true
+                },
+                {
+                    id: 4,
+                    text: 'app水浒传',
+                    done: true
+                }
+            ]
+        },
+        mutations: {
+            increament(state) {
+                console.log('未命名调用mutations')
+                state.count++
+            }
+        },
+        actions: {
+            increament(context) {
+                console.log('未命名调用actions')
+                console.log(context)
+                context.commit('increament')
+            }
+        },
+        getters: {
+            doneList: (state, getters, rootState, rootGetters) => {
+                console.log('未命名调用getters')
+                return state.list.filter(item => item.done)
+            }
+        }
+    }
+</script>
+<script>
+    const nameSpace = {
+        namespaced: true,
+        state: {
+            count: 100,
+            title: '命名空间',
+            list: [{
+                    id: 1,
+                    text: 'nameSpace三国演义',
+                    done: false
+                },
+                {
+                    id: 2,
+                    text: 'nameSpace红楼梦',
+                    done: true
+                },
+                {
+                    id: 3,
+                    text: 'nameSpace西游记',
+                    done: true
+                },
+                {
+                    id: 4,
+                    text: 'nameSpace水浒传',
+                    done: true
+                }
+            ]
+        },
+        mutations: {
+            increament(state) {
+                console.log('命名空间调用mutations')
+                state.count++
+            }
+        },
+        actions: {
+            add: {
+                root: true,
+                handler(context) {
+                    context.dispatch('increament', null, {
+                        root: true
+                    })
+                }
+            },
+            increament(context) {
+                console.log('命名空间调用actions')
+                // context.commit('increament', null, {
+                //     root: true
+                // })
+                // context.dispatch('increament', null, {
+                //     root: true
+                // })
+                context.commit('increament')
+            }
+        },
+        getters: {
+            doneList: (state, getters) => {
+                console.log('命名空间调用getters')
+                return state.list.filter(item => item.done)
+            }
+        }
+    }
+</script>
+<script>
+    const {
+        mapState,
+        mapGetters,
+        mapMutations,
+        mapActions,
+        createNamespacedHelpers
+    } = Vuex
+    Vue.use(Vuex)
+    // Vuex
+    const store = new Vuex.Store({
+        state: {
+            count: 1000,
+            title: '全局空间',
+            list: [{
+                    id: 1,
+                    text: 'global三国演义',
+                    done: false
+                },
+                {
+                    id: 2,
+                    text: 'global红楼梦',
+                    done: true
+                },
+                {
+                    id: 3,
+                    text: 'global西游记',
+                    done: true
+                },
+                {
+                    id: 4,
+                    text: 'global水浒传',
+                    done: true
+                }
+            ]
+        },
+        mutations: {
+            increament(state) {
+                console.log('全局空间调用mutations')
+                state.count++
+            }
+        },
+        actions: {
+            increament(context) {
+                console.log('全局空间调用actions')
+                console.log(context)
+                context.commit('increament')
+            }
+        },
+        getters: {
+            doneListFn: state => {
+                console.log('全局空间调用getters')
+                return state.list.filter(item => item.done)
+            }
+        },
+        modules: {
+            app: app,
+            nameSpace: nameSpace
+        }
+    })
+    // 模块动态注册
+    store.registerModule('nested', {
+        state: {
+            test: 'aaa',
+            list: [{
+                    id: 1,
+                    text: 'nested三国演义',
+                    done: false
+                },
+                {
+                    id: 2,
+                    text: 'nested红楼梦',
+                    done: true
+                },
+                {
+                    id: 3,
+                    text: 'nested西游记',
+                    done: true
+                },
+                {
+                    id: 4,
+                    text: 'nested水浒传',
+                    done: true
+                }
+            ]
+        }
+    }, {
+        preserveStatus: true
+    })
+    store.registerModule(['nested', 'myModule'], {
+        state: {
+            count: -1,
+            list: [{
+                    id: 1,
+                    text: 'myModule三国演义',
+                    done: false
+                },
+                {
+                    id: 2,
+                    text: 'myModule红楼梦',
+                    done: true
+                },
+                {
+                    id: 3,
+                    text: 'myModule西游记',
+                    done: true
+                },
+                {
+                    id: 4,
+                    text: 'myModule水浒传',
+                    done: true
+                }
+            ]
+        },
+        mutations: {
+            selfModuleFn(state) {
+                console.log('注册嵌套调用mutations')
+                state.count--
+            }
+        }
+    })
+</script>
 <script type="module">
+    import ShoppingCart from './components/ShoppingCart.js'
     import InstanceComponent from "./components/InstanceComponent.js";
     import TemplateComponent from "./components/TemplateComponent.js";
     import EventComponent from "./components/EventComponent.js";
     import PropComponent from "./components/PropComponent.js";
+    import SlotComponent from './components/SlotComponent.js'
+    import MixinComponent from './components/MixinComponent.js'
+    // 全局自定义指令
+    Vue.directive('focus', {
+        bind:function(el){
+            console.log('全局自定义指令')
+            el.focus()
+        }
+    })
+    // 全局过滤器
+    var status = {
+        0:'未启动',
+        1: '成功',
+        2: '失败'
+    }
+    Vue.filter('status' + 'Filter', function(value, source) {
+         return status[value] || ''
+    })
+    // 全局组件
+    Vue.component('VueComponent',{
+        name: 'VueComponent',
+        custonOptions: 'foo',
+        delimiters: ['${', '}'],
+        // comments:  true,
+        data() {
+            return{
+                title: '全局组件',
+                msg: 'delimiters分隔符'
+            }
+        },
+        methods: {
+            handleClick(){
+                // console.log(this.$data)
+                // console.log(this.$props)
+                // console.log(this.$el)
+                // console.log(this.$parent)
+                // console.log(this.$root)
+                // console.log(this.$children)
+                // console.log(this.$attrs)
+                // console.log(this.$options)
+                // console.log(this.$options.custonOptions)
+                console.log(this.$listeners)
+            }
+        },
+        template: '#vueTemplate'
+    })
     const app = new Vue({
         el: "#app",
+        store,
         components: {
             InstanceComponent,
             TemplateComponent,
             EventComponent,
             PropComponent,
+            SlotComponent,
+            MixinComponent,
+            ShoppingCart
+        },
+        propsData: {
+            publicData: '公共数据'
         },
         data() {
             return {
+                showShopping: true,
                 title: "Vue2",
+                url: '/profile',
                 list: [
                     {
                         title: "Vue实例",
@@ -79,55 +414,69 @@
                             },
                         ],
                     },
-                    {
-                        title: "事件处理",
-                        component: EventComponent,
+                    // {
+                    //     title: "事件处理",
+                    //     component: EventComponent,
+                    //     children: [
+                    //         {
+                    //             name: "多时间处理器",
+                    //         },
+                    //     ],
+                    // },
+                    // {
+                    //     title: "Prop",
+                    //     component: PropComponent,
+                    //     children: [
+                    //         {
+                    //             name: "非Prop的Attribute",
+                    //         },
+                    //     ],
+                    // },
+                     {
+                        title: "可复用性&组合",
+                        component: MixinComponent,
                         children: [
                             {
-                                name: "多时间处理器",
+                                name: "自定义指令",
                             },
                         ],
-                    },
-                    {
-                        title: "Prop",
-                        component: PropComponent,
-                        children: [
-                            {
-                                name: "非Prop的Attribute",
-                            },
-                        ],
-                    },
+                    }
                 ],
             };
         },
-        beforeCreate() {
-            console.log(this);
-            console.log("父组件beforeCreate");
+        methods: {
+            handleClickFn(){
+                console.log('111')
+            }
         },
-        created() {
-            console.log(this);
-            console.log("父组件created");
-        },
-        mounted() {
-            console.log(this);
-            console.log("父组件mounted");
-        },
-        beforeUpdate() {
-            console.log(this);
-            console.log("父组件beforeUpdate");
-        },
-        updated() {
-            console.log(this);
-            console.log("父组件updated");
-        },
-        beforeDestroy() {
-            console.log(this);
-            console.log("父组件beforeDestroy");
-        },
-        destroyed() {
-            console.log(this);
-            console.log("父组件destroyed");
-        },
+        // beforeCreate() {
+        //     console.log(this);
+        //     console.log("父组件beforeCreate");
+        // },
+        // created() {
+        //     console.log(this);
+        //     console.log("父组件created");
+        // },
+        // mounted() {
+        //     console.log(this);
+        //     console.log("父组件mounted");
+        // },
+        // beforeUpdate() {
+        //     console.log(this);
+        //     console.log("父组件beforeUpdate");
+        // },
+        // updated() {
+        //     console.log(this);
+        //     console.log("父组件updated");
+        // },
+        // beforeDestroy() {
+        //     console.log(this);
+        //     console.log("父组件beforeDestroy");
+        // },
+        // destroyed() {
+        //     console.log(this);
+        //     console.log("父组件destroyed");
+        // },
     });
 </script>
 

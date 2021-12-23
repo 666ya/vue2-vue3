@@ -23,34 +23,34 @@
              obj
          }
      },
-     beforeCreate() {
-         console.log(this)
-         console.log('子组件beforeCreate')
-     },
-     created() {
-         console.log(this)
-         console.log('子组件created')
-     },
-     mounted() {
-         console.log(this)
-         console.log('子组件mounted')
-     },
-     beforeUpdate() {
-         console.log(this)
-         console.log('子组件beforeUpdate')
-     },
-     updated() {
-         console.log(this)
-         console.log('子组件updated')
-     },
-     beforeDestroy() {
-         console.log(this)
-         console.log('子组件beforeDestroy')
-     },
-     destroyed() {
-         console.log(this)
-         console.log('子组件destroyed')
-     },
+     //  beforeCreate() {
+     //      console.log(this)
+     //      console.log('子组件beforeCreate')
+     //  },
+     //  created() {
+     //      console.log(this)
+     //      console.log('子组件created')
+     //  },
+     //  mounted() {
+     //      console.log(this)
+     //      console.log('子组件mounted')
+     //  },
+     //  beforeUpdate() {
+     //      console.log(this)
+     //      console.log('子组件beforeUpdate')
+     //  },
+     //  updated() {
+     //      console.log(this)
+     //      console.log('子组件updated')
+     //  },
+     //  beforeDestroy() {
+     //      console.log(this)
+     //      console.log('子组件beforeDestroy')
+     //  },
+     //  destroyed() {
+     //      console.log(this)
+     //      console.log('子组件destroyed')
+     //  },
      methods: {
          handleDestory() {
              console.log('销毁')
