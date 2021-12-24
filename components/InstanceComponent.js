@@ -6,7 +6,12 @@
  const InstanceComponent = {
      name: 'InstanceComponent',
      props: {
-         title: String
+         title: String,
+         list: {
+             default () {
+                 return this.dataList
+             }
+         }
      },
      watch: {
          title: {
@@ -20,7 +25,8 @@
      },
      data() {
          return {
-             obj
+             obj,
+             dataList: ['1', '2']
          }
      },
      //  beforeCreate() {
@@ -59,6 +65,7 @@
      },
      template: `
         <p>
+        <span v-for="item in list">{{ item }}</span>
          <span>{{ title }}{{ obj.content }}</span>
          <button @click="obj.content = '改变了'">改变freeze冻结值</button>
          <button @click="handleDestory">销毁</button>

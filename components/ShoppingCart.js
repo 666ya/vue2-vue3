@@ -1,5 +1,6 @@
 const template = `
     <div>
+        <slot></slot>
         <p>  {{title}}：{{ count }} </p>
     </div>
     `
