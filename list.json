@@ -1,0 +1,62 @@
+[
+  {
+    "name": "小米12",
+    "price": "4999",
+    "user": "张三"
+  },
+  {
+    "name": "iPhone13",
+    "price": "7999",
+    "user": "张三"
+  },
+  {
+    "name": "airPods",
+    "price": "2999",
+    "user": "张三"
+  },
+  {
+    "name": "小米12",
+    "price": "4999",
+    "user": "李四"
+  },
+  {
+    "name": "iPhone13",
+    "price": "7999",
+    "user": "李四"
+  },
+  {
+    "name": "airPods",
+    "price": "2999",
+    "user": "李四"
+  },
+  {
+    "name": "小米12",
+    "price": "4999",
+    "user": "王五"
+  },
+  {
+    "name": "iPhone13",
+    "price": "7999",
+    "user": "王五"
+  },
+  {
+    "name": "airPods",
+    "price": "2999",
+    "user": "王五"
+  },
+  {
+    "name": "小米12",
+    "price": "4999",
+    "user": "乔六"
+  },
+  {
+    "name": "iPhone13",
+    "price": "7999",
+    "user": "乔六"
+  },
+  {
+    "name": "airPods",
+    "price": "2999",
+    "user": "乔六"
+  }
+]

@@ -30,15 +30,22 @@ const template = `<div class="component">
     </li>
     <li>
        <h3>移除v-on.native修饰符</h3>
-       <onnativecom  v-on:click.native="handleClick"></onnativecom>
+       <onnativecom v-on:click="handleClick" v-on:close="handleClose"></onnativecom>
+    </li>
+     <li>
+       <h3>侦听数据</h3>
+       <list-com></list-com>
+    </li>
+     <li>
+       <h3>Attribute强制行为</h3>
+       <attr-com></attr-com>
     </li>
 </ul>
 </div>`
 const TransitionCom = {
   name: 'TransitionCom',
-  data(){
-    return {
-    }
+  data() {
+    return {}
   },
   template: `
     <div>
@@ -49,27 +56,70 @@ const TransitionCom = {
 }
 const OnNativeCom = {
   name: 'onnativecom',
-  data(){
-    return {
-    }
+  emits: ['click'],
+  data() {
+    return {}
   },
   methods: {
-    handleClick() {
-      alert('移除v-on.native修饰符')
-    },
-    close(){
-     alert('组件事件')
+    handleClose(e){
+      this.$emit('close')
     }
   },
-  template: `<div>组件根元素点击事件</div>`
+  template: `
+    <div>
+        组件根元素
+        <p @click.prevent="handleClose">非根元素（自定义事件）</p>
+    </div>
+    `
+}
+// 侦听数组(非兼容)
+const ListCom = {
+  name: 'ListCom',
+  data(){
+    return {
+      list: [0,1,2],
+      refItem: []
+    }
+  },
+  watch:{
+    list(val, oldVal){
+      alert('list changed')
+    }
+  },
+  methods:{
+    handleClick() {
+      // this.list = [1,2,3,4,5]
+      // this.list.push(this.list.length)
+    }
+  },
+  template: `<div><span v-for="item in list" :ref="item" :key=""item>{{ item }}</span><button @click="handleClick">点击改变数据</button></div>`
 }
 
-
+// attr强制行为
+const AttrCom = {
+  name: 'AttrCom',
+  data() {
+    return {
+      truthy: undefined,
+      foo: false,
+      name: '测试Attribute',
+      templateFlag: true
+    }
+  },
+  template: `<div>
+        <template>
+          '没有特殊指令的标记 (v-if/else-if/else、v-for 或 v-slot) 的template 现在被视为普通元素，并将渲染为原生的template元素，而不是渲染其内部内容。'
+        </template>
+        <input v-model="name" :foo="foo" :title="truthy" :disabled="truthy"/>
+        </div>`
+}
 const DiffComponent = {
   name: "DiffComponent",
   components: {
     TransitionCom,
-    onnativecom: OnNativeCom
+    ListCom,
+    onnativecom: OnNativeCom,
+    AttrCom
   },
   props: {
     list: {
@@ -89,6 +139,12 @@ const DiffComponent = {
     };
   },
   methods: {
+    handleClose(){
+      alert('自定义事件')
+    },
+    handleClick() {
+      alert('移除v-on.native修饰符')
+    },
     login() {
       console.log("aa");
       this.show = !this.show
