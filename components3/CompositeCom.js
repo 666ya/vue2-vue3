@@ -1,12 +1,6 @@
-const {ref, onMounted, computed, toRefs, watch} = Vue
-
-function fetchList() {
-  fetch('../list.json')
-  .then(response => {
-    return response.json()
-  })
-}
-
+import useList from './composables/useList.js'
+import useNameSearch from "./composables/useNameSearch.js";
+const { toRefs } = Vue
 export default {
   name: 'CompositeCom',
   props: {
@@ -16,27 +10,10 @@ export default {
     }
   },
   setup(props) {
-    console.log(props)
     const { user } = toRefs(props)
-    console.log(user)
-    const list = ref([])
-    const getList = () => {
-      fetch('../list.json')
-      .then(response => {
-        return response.json()
-      }).then(data => list.value = data)
-    }
-    onMounted(getList)
-    const filterText = ref('')
-    const filterList = computed(() => {
-      return filterText.value ? list.value.filter(item => item.user.includes(filterText.value)) : list.value
-    })
-
-    // watch
-    watch(user, getList)
+    const { list, getList } = useList(user)
+    const { filterText, filterList } = useNameSearch(list)
     return {
-      list,
-      getList,
       filterText,
       filterList
     }
