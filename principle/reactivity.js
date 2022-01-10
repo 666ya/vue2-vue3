@@ -66,4 +66,6 @@ effect(() => {
 effect(() => {
     salePrice = product.price * 0.9
 })
+
+
 // effect()
