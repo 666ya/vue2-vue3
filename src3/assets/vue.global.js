@@ -207,7 +207,7 @@ var Vue = (function (exports) {
       'foreignObject,g,hatch,hatchpath,image,line,linearGradient,marker,mask,' +
       'mesh,meshgradient,meshpatch,meshrow,metadata,mpath,path,pattern,' +
       'polygon,polyline,radialGradient,rect,set,solidcolor,stop,switch,symbol,' +
-      'text,textPath,title,tspan,unknown,use,view';
+      'text,textPath,title,tspan,unknown,use,views';
   const VOID_TAGS = 'area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr';
   const isHTMLTag = /*#__PURE__*/ makeMap(HTML_TAGS);
   const isSVGTag = /*#__PURE__*/ makeMap(SVG_TAGS);
@@ -1267,7 +1267,7 @@ var Vue = (function (exports) {
    * Returns a reactive-copy of the original object, where only the root level
    * properties are readonly, and does NOT unwrap refs nor recursively convert
    * returned properties.
-   * This is used for creating the props proxy object for stateful components.
+   * This is used for creating the props proxy object for stateful src2.
    */
   function shallowReadonly(target) {
       return createReactiveObject(target, true, shallowReadonlyHandlers, shallowReadonlyCollectionHandlers, shallowReadonlyMap);
@@ -1565,7 +1565,7 @@ var Vue = (function (exports) {
               normalizeClassComponent(instance.type).render = newRender;
           }
           instance.renderCache = [];
-          // this flag forces child components with slot content to update
+          // this flag forces child src2 with slot content to update
           isHmrUpdating = true;
           instance.update();
           isHmrUpdating = false;
@@ -1576,7 +1576,7 @@ var Vue = (function (exports) {
       if (!record)
           return;
       newComp = normalizeClassComponent(newComp);
-      // update initial def (for not-yet-rendered components)
+      // update initial def (for not-yet-rendered src2)
       updateComponentDef(record.initialDef, newComp);
       // create a snapshot which avoids the set being mutated during updates
       const instances = [...record.instances];
@@ -1602,7 +1602,7 @@ var Vue = (function (exports) {
           }
           else if (instance.parent) {
               // 4. Force the parent instance to re-render. This will cause all updated
-              // components to be unmounted and re-mounted. Queue the update so that we
+              // src2 to be unmounted and re-mounted. Queue the update so that we
               // don't end up forcing the same parent to re-render multiple times.
               queueJob(instance.parent.update);
               // instance is the inner component of an async custom element
@@ -1624,7 +1624,7 @@ var Vue = (function (exports) {
               console.warn('[HMR] Root or manually mounted instance modified. Full reload required.');
           }
       }
-      // 5. make sure to cleanup dirty hmr components after update
+      // 5. make sure to cleanup dirty hmr src2 after update
       queuePostFlushCb(() => {
           for (const instance of instances) {
               hmrDirtyComponents.delete(normalizeClassComponent(instance.type));
@@ -3222,7 +3222,7 @@ var Vue = (function (exports) {
                   }
               }, parentSuspense);
               {
-                  // Update components tree
+                  // Update src2 tree
                   devtoolsComponentAdded(instance);
               }
           };
@@ -3240,7 +3240,7 @@ var Vue = (function (exports) {
                   instance.isDeactivated = true;
               }, parentSuspense);
               {
-                  // Update components tree
+                  // Update src2 tree
                   devtoolsComponentAdded(instance);
               }
           };
@@ -3324,7 +3324,7 @@ var Vue = (function (exports) {
               }
               let vnode = getInnerChild(rawVNode);
               const comp = vnode.type;
-              // for async components, name check should be based in its loaded
+              // for async src2, name check should be based in its loaded
               // inner component if available
               const name = getComponentName(isAsyncWrapper(vnode)
                   ? vnode.type.__asyncResolved || {}
@@ -3420,7 +3420,7 @@ var Vue = (function (exports) {
       // In addition to registering it on the target instance, we walk up the parent
       // chain and register it on all ancestor instances that are keep-alive roots.
       // This avoids the need to walk the entire component tree when invoking these
-      // hooks, and more importantly, avoids the need to track child components in
+      // hooks, and more importantly, avoids the need to track child src2 in
       // arrays.
       if (target) {
           let current = target.parent;
@@ -4725,7 +4725,7 @@ var Vue = (function (exports) {
           return;
       }
       if (isAsyncWrapper(vnode) && !isUnmount) {
-          // when mounting async components, nothing needs to be done,
+          // when mounting async src2, nothing needs to be done,
           // because the template ref is forwarded to inner component
           return;
       }
@@ -6540,7 +6540,7 @@ var Vue = (function (exports) {
               dynamicChildren = null;
           }
           if (n1 == null) {
-              // insert anchors in the main view
+              // insert anchors in the main views
               const placeholder = (n2.el = createComment('teleport start')
                   );
               const mainAnchor = (n2.anchor = createComment('teleport end')
@@ -6644,7 +6644,7 @@ var Vue = (function (exports) {
       }
       const { el, anchor, shapeFlag, children, props } = vnode;
       const isReorder = moveType === 2 /* REORDER */;
-      // move main view anchor if this is a re-order.
+      // move main views anchor if this is a re-order.
       if (isReorder) {
           insert(el, container, parentAnchor);
       }
@@ -6659,7 +6659,7 @@ var Vue = (function (exports) {
               }
           }
       }
-      // move main view anchor if this is a re-order.
+      // move main views anchor if this is a re-order.
       if (isReorder) {
           insert(anchor, container, parentAnchor);
       }
@@ -7364,7 +7364,7 @@ var Vue = (function (exports) {
   }
 
   /**
-   * #2437 In Vue 3, functional components do not have a public instance proxy but
+   * #2437 In Vue 3, functional src2 do not have a public instance proxy but
    * they exist in the internal parent chain. For code that relies on traversing
    * public $parent chains, skip functional ones and go to the parent instead.
    */
@@ -8694,7 +8694,7 @@ var Vue = (function (exports) {
    * instance properties when it is accessed by a parent component via template
    * refs.
    *
-   * `<script setup>` components are closed by default - i.e. varaibles inside
+   * `<script setup>` src2 are closed by default - i.e. varaibles inside
    * the `<script setup>` scope is not exposed to parent unless explicitly exposed
    * via `defineExpose`.
    *
@@ -14191,7 +14191,7 @@ var Vue = (function (exports) {
               // <button is="vue:xxx">
               // if not <component>, only is value that starts with "vue:" will be
               // treated as component by the parse phase and reach here, unless it's
-              // compat mode where all is values are considered components
+              // compat mode where all is values are considered src2
               tag = isProp.value.content.slice(4);
           }
       }
@@ -14202,7 +14202,7 @@ var Vue = (function (exports) {
               isDir.exp
           ]);
       }
-      // 2. built-in components (Teleport, Transition, KeepAlive, Suspense...)
+      // 2. built-in src2 (Teleport, Transition, KeepAlive, Suspense...)
       const builtIn = isCoreComponent(tag) || context.isBuiltInComponent(tag);
       if (builtIn) {
           // built-ins are simply fallthroughs / have special handling during ssr
@@ -14726,7 +14726,7 @@ var Vue = (function (exports) {
       if (shouldCache) {
           // cache handlers so that it's always the same handler being passed down.
           // this avoids unnecessary re-renders when users use inline handlers on
-          // components.
+          // src2.
           ret.props[0].value = context.cache(ret.props[0].value);
       }
       // mark the key as handler for props normalization check

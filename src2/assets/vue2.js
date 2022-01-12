@@ -2056,7 +2056,7 @@
       warn(
         "Property or method \"" + key + "\" is not defined on the instance but " +
         'referenced during render. Make sure that this property is reactive, ' +
-        'either in the data option, or for class-based components, by ' +
+        'either in the data option, or for class-based src2, by ' +
         'initializing the property. ' +
         'See: https://vuejs.org/v2/guide/reactivity.html#Declaring-Reactive-Properties.',
         target
@@ -2352,11 +2352,11 @@
   // generated render function is guaranteed to return Array<VNode>. There are
   // two cases where extra normalization is needed:
 
-  // 1. When the children contains components - because a functional component
+  // 1. When the children contains src2 - because a functional component
   // may return an Array instead of a single root. In this case, just a simple
   // normalization is needed - if any child is an Array, we flatten the whole
   // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
-  // because functional components already normalize their own children.
+  // because functional src2 already normalize their own children.
   function simpleNormalizeChildren (children) {
     for (var i = 0; i < children.length; i++) {
       if (Array.isArray(children[i])) {
@@ -2988,7 +2988,7 @@
     var this$1 = this;
 
     var options = Ctor.options;
-    // ensure the createElement function in functional components
+    // ensure the createElement function in functional src2
     // gets a unique context - this is necessary for correct named slot check
     var contextVm;
     if (hasOwn(parent, '_uid')) {
@@ -3133,7 +3133,7 @@
         !vnode.componentInstance._isDestroyed &&
         vnode.data.keepAlive
       ) {
-        // kept-alive components, treat as a patch
+        // kept-alive src2, treat as a patch
         var mountedNode = vnode; // work around flow
         componentVNodeHooks.prepatch(mountedNode, mountedNode);
       } else {
@@ -3167,7 +3167,7 @@
       if (vnode.data.keepAlive) {
         if (context._isMounted) {
           // vue-router#1212
-          // During updates, a kept-alive component's child components may
+          // During updates, a kept-alive component's child src2 may
           // change, so directly walking the tree here may call activated hooks
           // on incorrect children. Instead we push them into a queue which will
           // be processed after the whole patch process ended.
@@ -3265,7 +3265,7 @@
     data.on = data.nativeOn;
 
     if (isTrue(Ctor.options.abstract)) {
-      // abstract components do not keep anything
+      // abstract src2 do not keep anything
       // other than props & listeners & slot
 
       // work around flow
@@ -3436,7 +3436,7 @@
         // platform built-in elements
         if (isDef(data) && isDef(data.nativeOn) && data.tag !== 'component') {
           warn(
-            ("The .native modifier for v-on is only valid on components but it was used on <" + tag + ">."),
+            ("The .native modifier for v-on is only valid on src2 but it was used on <" + tag + ">."),
             context
           );
         }
@@ -4096,7 +4096,7 @@
     hydrating = false;
 
     // manually mounted instance, call mounted on self
-    // mounted is called for render-created child components in its inserted hook
+    // mounted is called for render-created child src2 in its inserted hook
     if (vm.$vnode == null) {
       vm._isMounted = true;
       callHook(vm, 'mounted');
@@ -4376,7 +4376,7 @@
    */
   function queueActivatedComponent (vm) {
     // setting _inactive to false here so that a render function can
-    // rely on checking whether it's in an inactive tree (e.g. router-view)
+    // rely on checking whether it's in an inactive tree (e.g. router-views)
     vm._inactive = false;
     activatedChildren.push(vm);
   }
@@ -5392,7 +5392,7 @@
         var cache = ref$1.cache;
         var keys = ref$1.keys;
         var key = vnode.key == null
-          // same constructor may get registered as different local components
+          // same constructor may get registered as different local src2
           // so cid alone is not enough (#3269)
           ? componentOptions.Ctor.cid + (componentOptions.tag ? ("::" + (componentOptions.tag)) : '')
           : vnode.key;
@@ -5458,7 +5458,7 @@
     });
 
     // this is used to identify the "base" constructor to extend all plain-object
-    // components with in Weex's multi-instance scenarios.
+    // src2 with in Weex's multi-instance scenarios.
     Vue.options._base = Vue;
 
     extend(Vue.options.components, builtInComponents);
@@ -5649,7 +5649,7 @@
   var isSVG = makeMap(
     'svg,animate,circle,clippath,cursor,defs,desc,ellipse,filter,font-face,' +
     'foreignobject,g,glyph,image,line,marker,mask,missing-glyph,path,pattern,' +
-    'polygon,polyline,rect,switch,symbol,text,textpath,tspan,use,view',
+    'polygon,polyline,rect,switch,symbol,text,textpath,tspan,use,views',
     true
   );
 
@@ -5976,7 +5976,7 @@
           if (isUnknownElement$$1(vnode, creatingElmInVPre)) {
             warn(
               'Unknown custom element: <' + tag + '> - did you ' +
-              'register the component correctly? For recursive components, ' +
+              'register the component correctly? For recursive src2, ' +
               'make sure to provide the "name" option.',
               vnode.context
             );
@@ -8820,7 +8820,7 @@
       }
 
       // apply transition data to child
-      // use getRealChild() to ignore abstract components e.g. keep-alive
+      // use getRealChild() to ignore abstract src2 e.g. keep-alive
       var child = getRealChild(rawChild);
       /* istanbul ignore if */
       if (!child) {
@@ -9072,7 +9072,7 @@
   Vue.config.getTagNamespace = getTagNamespace;
   Vue.config.isUnknownElement = isUnknownElement;
 
-  // install platform runtime directives & components
+  // install platform runtime directives & src2
   extend(Vue.options.directives, platformDirectives);
   extend(Vue.options.components, platformComponents);
 
@@ -10230,7 +10230,7 @@
           {
             if (!maybeComponent(el)) {
               warn$2(
-                "v-slot can only be used on components or <template>.",
+                "v-slot can only be used on src2 or <template>.",
                 slotBinding$1
               );
             }
@@ -10684,7 +10684,7 @@
     node.static = isStatic(node);
     if (node.type === 1) {
       // do not make component slot content static. this avoids
-      // 1. components not able to mutate slot nodes
+      // 1. src2 not able to mutate slot nodes
       // 2. static slot content fails for hot-reloading
       if (
         !isPlatformReservedTag(node.tag) &&
@@ -11168,7 +11168,7 @@
     if (el.pre) {
       data += "pre:true,";
     }
-    // record original tag name for components using "is" attribute
+    // record original tag name for src2 using "is" attribute
     if (el.component) {
       data += "tag:\"" + (el.tag) + "\",";
     }
@@ -11258,7 +11258,7 @@
     var ast = el.children[0];
     if (el.children.length !== 1 || ast.type !== 1) {
       state.warn(
-        'Inline-template components must have exactly one child element.',
+        'Inline-template src2 must have exactly one child element.',
         { start: el.start }
       );
     }
@@ -11274,7 +11274,7 @@
     state
   ) {
     // by default scoped slots are considered "stable", this allows child
-    // components with only scoped slots to skip forced updates from parent.
+    // src2 with only scoped slots to skip forced updates from parent.
     // but in some cases we have to bail-out of this optimization
     // for example if the slot contains dynamic names, has v-if or v-for on them...
     var needsForceUpdate = el.for || Object.keys(slots).some(function (key) {

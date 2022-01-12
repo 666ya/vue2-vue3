@@ -1,6 +1,6 @@
 export default {
     name: 'AppConfigCom',
-    tempalte: '<div>globalPropperties: {{ globalPropperty }}</div></div>',
+    template: '<div>globalPropperties: {{ globalPropperty }} {{ globalTest }}</div>',
     data() {
         return {
             globalPropperty: ''
@@ -8,5 +8,7 @@ export default {
     },
     mounted() {
         this.globalPropperty = this.$global
-    }
+        console.log(this.$options.myOption)
+    },
+    myOption: '这是组件自定义选项'
 }

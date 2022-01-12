@@ -90,5 +90,8 @@ export default {
             title: ''
         }
     },
-    template
+    template: '<div>aa</div>',
+    created() {
+        console.log(this.$options.custom)
+    }
 }

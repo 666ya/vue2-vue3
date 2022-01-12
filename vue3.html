@@ -56,45 +56,48 @@
         </ul>
       </aside>
       <section>
-        <div v-if='curComponent == "AppApi"'>
+        <!-- <div>
           <app-component></app-component>
-        </div>
+        </div> -->
         <template v-for="(item,index) in apiList" :key="index">
-          <div v-if="item.component && item.curComponent === name" @click="curComponent = item.name">
+          <div v-if="item.component && curComponent === item.name" @click="curComponent = item.name">
             <h2>{{ item.title }}</h2>
-            <Component :is="item.component" :user="user"></Component>
+            <Component :is="item.component"></Component>
           </div>
         </template>
       </section>
     </div>
   </div>
 </body>
-<script src="./vue.global.js"></script>
-<script>
-  const {
-    defineAsyncComponent
-  } = Vue
-</script>
+<script src="src3/assets/vue.global.js"></script>
 <script type="module">
-  import SlotCom from "./components3/SlotCom.js";
-  import CompositeCom from "./components3/CompositeCom.js";
+  import { toLowerCasePlugin } from './src3/plugins/index.js'
+  // views
+  import AppConfigCom from './src3/views/AppConfigCom.js'
+  import AppApiCom from './src3/views/AppApiCom.js'
+  import AppOptionsCom from './src3/views/AppOptionsCom.js'
+  import CompositeCom from "./src3/views/CompositeCom.js";
   import DiffComponent from './diffcomponent/DiffComponent.js'
-  import AppConfigCom from './components3/AppConfigCom.js'
-  import AppApiCom from './components3/AppApiCom.js'
+  import SlotCom from "./src3/views/SlotCom.js";
+
   const App = {
     inject: ['userLogin'],
     components: {
       SlotCom,
       CompositeCom,
       AppConfigCom,
-      AppApiCom
+      AppApiCom,
+      AppOptionsCom
     },
     data() {
       return {
+        _value: '_value',
+        _unline: '_符号property',
+        $test: '$符号property',
         user: '张三',
         ok: false,
         title: 'Vue3',
-        curComponent: 'AppApiCom',
+        curComponent: 'AppOptionsCom',
         apiList: [
           // {
           //   title: '插槽',
@@ -108,13 +111,18 @@
           // },
           //  {
           //  title: '应用配置',
-          //  name: 'AppConfig',
+          //  name: 'AppConfigCom',
           //  component: AppConfigCom
           //  },
+          // {
+          //     title: '应用API',
+          //     name: 'AppApiCom',
+          //     component: AppApiCom
+          // },
           {
-              title: '应用API',
-              name: 'AppApiCom',
-              component: AppApiCom
+            title: '选项',
+            name: 'AppOptionsCom',
+            component: AppOptionsCom
           },
           //  {
           //     title: '非兼容变更',
@@ -130,37 +138,67 @@
   /**
    * 应用配置
    */
-  console.log(app.config)
-   // 全局Propperty
+  // console.log(app.config)
+  // errorHandler
+  // app.config.errorHandler = (err, vm, info) => {
+  //   console.log(err)
+  //   console.log(vm)
+  //   console.log(info)
+  // }
+  // warnHandler
+  // app.config.warnHandler = (err, vm, trace) => {
+  //   console.log(err)
+  //   console.log(vm)
+  //   console.log(trace)
+  // }
+  // 全局Propperty
    app.config.globalProperties.$global = '全局property'
+   app.config.globalProperties.globalTest = 'test'
+  //自定义选项合并策略
+  app.config.optionMergeStrategies.myOption = (parentVal, childVal) => {
+     return parentVal || childVal
+  }
    /**
    * 应用API
    */
     // 组件
     app.component('AppComponent', {
       data() {
-      return {
-      msg: '全局组件'
-      }
+        return {
+        msg: '全局组件'
+        }
       },
       template: '<div>{{ msg }}</div>'
     })
     // 自定义指令
-    var directive = app.directive('toFixed', (el,binding, vnode) => {
+    app.directive('focus', (el) => {
+     el.focus()
+     })
+    app.directive('toFixed', (el,binding, vnode) => {
       if(binding.value) {
           binding.instance.inputValue = parseFloat(binding.instance.inputValue).toFixed('2')
       }
     })
     // provide
-    app.provide('userLogin', true)
+    app.provide('userLogin', 5)
+    // mixin
+    app.mixin({
+      myOption: '这是 minx\'s 自定义选项',
+    })
+    // use
+   app.use(toLowerCasePlugin)
     // mount
-     const vm = app.mount('#app')
+  const vm = app.mount('#app')
+    // console.log(vm.$data)
+    // console.log(vm._unline)
+    //  console.log(vm._value)
+    // console.log(vm.$test)
     // unmount
     // setTimeout(() => {
     //   app.unmount()
     // }, 1000)
     // version
-    console.log('vue当前版本：' + app.version)
+    // console.log('vue当前版本：' + app.version)
 </script>
 
 </html>

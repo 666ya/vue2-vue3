@@ -48,11 +48,11 @@
 
 <body>
     <div id="app" v-cloak>
-        <app-api-com></app-api-com>
+        <!-- <app-api-com></app-api-com>
         <shopping-cart v-if="showShopping" inline-template>
             <p>aaa</p>
-        </shopping-cart>
-        <template v-else>
+        </shopping-cart> -->
+        <template>
             <!-- <h1 v-bind:title="title">{{ title }}</h1> -->
             <div class="test">
                 <div class="zan">点赞</div>
@@ -88,8 +88,8 @@
         </template>
     </div>
 </body>
-<script src="./vue2.js"></script>
-<script src="./vuex.js"></script>
+<script src="src2/assets/vue2.js"></script>
+<script src="src2/store/vuex.js"></script>
 <script type="text/x-template" id="vueTemplate">
     <div>
         <p @click="handleClick">{{title}}可点击</p>
@@ -97,19 +97,19 @@
     </div>
 </script>
 <!-- modules -->
-<script src="./store/modules/app.js"></script>
-<script src="./store/modules/nameSpace.js"></script>
+<script src="src2/store/modules/app.js"></script>
+<script src="src2/store/modules/nameSpace.js"></script>
 <!-- vuex -->
-<script src="./store/index.js"></script>
+<script src="src2/store/index.js"></script>
 <script type="module">
-    import ShoppingCart from './components/ShoppingCart.js'
-    import InstanceComponent from "./components/InstanceComponent.js";
-    import TemplateComponent from "./components/TemplateComponent.js";
-    import EventComponent from "./components/EventComponent.js";
-    import PropComponent from "./components/PropComponent.js";
-    import SlotComponent from './components/SlotComponent.js'
-    import MixinComponent from './components/MixinComponent.js'
-    import AppApiCom from './components3/AppApiCom.js'
+    import ShoppingCart from './src2/views/ShoppingCart.js'
+    import InstanceComponent from "./src2/views/InstanceComponent.js";
+    import TemplateComponent from "./src2/views/TemplateComponent.js";
+    import EventComponent from "./src2/views/EventComponent.js";
+    import PropComponent from "./src2/views/PropComponent.js";
+    import SlotComponent from './src2/views/SlotComponent.js'
+    import MixinComponent from './src2/views/MixinComponent.js'
+    import AppApiCom from './src3/views/AppApiCom.js'
 
     // 非兼容变更
     import DiffComponent from './diffcomponent/DiffComponent.js'
@@ -123,11 +123,7 @@
     Vue.directive('toFixed', (el,binding, vnode) => {
         console.log(el)
         console.log(binding)
-         console.log(vnode)
-        // if(binding.value) {
-        // binding.instance.inputValue = parseFloat(binding.instance.inputValue).toFixed('2')
-        // }
-        // console.log(binding.instance.inputValue)
+        console.log(vnode)
     })
     // 全局过滤器
     var status = {
@@ -137,6 +133,13 @@
     }
     Vue.filter('status' + 'Filter', function(value, source) {
          return status[value] || ''
+    })
+    // mixin
+    Vue.mixin({
+        custom: 'minx\'s 自定义选项',
+        mounted(){
+            console.log('全局mixin')
+        }
     })
     // 全局组件
     Vue.component('VueComponent',{
@@ -179,15 +182,15 @@
                 title: "Vue2",
                 url: '/profile',
                 list: [
-                    {
-                        title: "Vue实例",
-                        component: InstanceComponent,
-                        children: [
-                            {
-                                name: "数据与方法",
-                            },
-                        ],
-                    },
+                    // {
+                    //     title: "Vue实例",
+                    //     component: InstanceComponent,
+                    //     children: [
+                    //         {
+                    //             name: "数据与方法",
+                    //         },
+                    //     ],
+                    // },
                     {
                         title: "模板语法",
                         component: TemplateComponent,
@@ -215,20 +218,20 @@
                     //         },
                     //     ],
                     // },
-                     {
-                        title: "可复用性&组合",
-                        component: MixinComponent,
-                        children: [
-                            {
-                                name: "自定义指令",
-                            },
-                        ],
-                    },
-                  {
-                    title: '非兼容变更',
-                    name: 'Diff',
-                    component: DiffComponent
-                  }
+                    //  {
+                    //     title: "可复用性&组合",
+                    //     component: MixinComponent,
+                    //     children: [
+                    //         {
+                    //             name: "自定义指令",
+                    //         },
+                    //     ],
+                    // }
+                //   {
+                //     title: '非兼容变更',
+                //     name: 'Diff',
+                //     component: DiffComponent
+                //   }
                 ],
             };
         },

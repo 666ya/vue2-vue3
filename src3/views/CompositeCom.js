@@ -1,5 +1,5 @@
-import useList from './composables/useList.js'
-import useNameSearch from "./composables/useNameSearch.js";
+import useList from '../composables/useList.js'
+import useNameSearch from "../composables/useNameSearch.js";
 const { toRefs } = Vue
 export default {
   name: 'CompositeCom',

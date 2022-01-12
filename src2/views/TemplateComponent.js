@@ -100,10 +100,18 @@ const TemplateComponent = {
             //  this.obj.a.name.key = '测试改变'
         }
     },
+    mounted() {
+        // this.obj.b = 2
+        // setTimeout(() => {
+        //     this.$set(this.obj, 'b', 3)
+        //     console.log(this.obj.b)
+        // }, 5000)
+    },
     template: `
         <div>
             <parent-com></parent-com>
             <button v-bind:disabled="isButtonDisabled">属性值</button>
+            <div>对象值为：{{ obj.b }}</div>
             <div>
                 <span>{{ obj.a.name.key }}</span>
                 <span>{{ msg }}</span>
