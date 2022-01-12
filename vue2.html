@@ -48,6 +48,7 @@
 
 <body>
     <div id="app" v-cloak>
+        <app-api-com></app-api-com>
         <shopping-cart v-if="showShopping" inline-template>
             <p>aaa</p>
         </shopping-cart>
@@ -66,12 +67,12 @@
                         <component :is="item.component" />
                     </div>
                 </li>
-<!--                <li>-->
-<!--                    <h3>全局组件</h3>-->
-<!--                    <div>-->
-<!--                        <vue-component></vue-component>-->
-<!--                    </div>-->
-<!--                </li>-->
+                <!--                <li>-->
+                <!--                    <h3>全局组件</h3>-->
+                <!--                    <div>-->
+                <!--                        <vue-component></vue-component>-->
+                <!--                    </div>-->
+                <!--                </li>-->
             </ul>
             <!-- <slot-component>
             <template #header>
@@ -108,6 +109,7 @@
     import PropComponent from "./components/PropComponent.js";
     import SlotComponent from './components/SlotComponent.js'
     import MixinComponent from './components/MixinComponent.js'
+    import AppApiCom from './components3/AppApiCom.js'
 
     // 非兼容变更
     import DiffComponent from './diffcomponent/DiffComponent.js'
@@ -117,6 +119,15 @@
             console.log('全局自定义指令')
             el.focus()
         }
+    })
+    Vue.directive('toFixed', (el,binding, vnode) => {
+        console.log(el)
+        console.log(binding)
+         console.log(vnode)
+        // if(binding.value) {
+        // binding.instance.inputValue = parseFloat(binding.instance.inputValue).toFixed('2')
+        // }
+        // console.log(binding.instance.inputValue)
     })
     // 全局过滤器
     var status = {
@@ -150,6 +161,7 @@
         el: "#app",
         store,
         components: {
+            AppApiCom,
             InstanceComponent,
             TemplateComponent,
             EventComponent,

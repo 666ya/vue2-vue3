@@ -23,7 +23,7 @@ const FilterComponent = {
 // 局部自定义指令
 const directiveTemplate = `
 <div>
-    <input v-focus="inputValue" v-model="inputValue"/>
+    <input v-focus="inputValue"  v-model="inputValue"/>
     <div>
         <span v-selfDirective:[selfColor]></span>
         <button @click="changeSelfColor">改变自定义颜色</button>

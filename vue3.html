@@ -69,7 +69,7 @@
     </div>
   </div>
 </body>
-<script src="./vue3.js"></script>
+<script src="./vue.global.js"></script>
 <script>
   const {
     defineAsyncComponent
@@ -82,6 +82,7 @@
   import AppConfigCom from './components3/AppConfigCom.js'
   import AppApiCom from './components3/AppApiCom.js'
   const App = {
+    inject: ['userLogin'],
     components: {
       SlotCom,
       CompositeCom,
@@ -126,30 +127,40 @@
     // template: `<div id="rendered">{{ title }} {{ userName }}</div>`
   }
   const app = Vue.createApp(App)
-  // 全局Propperty
-  app.config.globalProperties.$global = '全局property'
-  // 全局自定义指令
-  app.directive('focus', {
-    mounted(el, binding) {
-      console.log(binding.instance.value = binding.instance.value.toFixed('2'))
-    },
-    updated(el) {
-      console.log(el)
-    }
-  })
-  app.directive('toFixed', (el) => {
-    console.log(el.value)
-  })
-  // 全局组件
-  app.component('AppComponent', {
-    data() {
+  /**
+   * 应用配置
+   */
+  console.log(app.config)
+   // 全局Propperty
+   app.config.globalProperties.$global = '全局property'
+   /**
+   * 应用API
+   */
+    // 组件
+    app.component('AppComponent', {
+      data() {
       return {
-        msg: '全局组件'
+      msg: '全局组件'
       }
-    },
-    template: '<div>{{ msg }}</div>'
-  })
-  const vm = app.mount('#app')
+      },
+      template: '<div>{{ msg }}</div>'
+    })
+    // 自定义指令
+    var directive = app.directive('toFixed', (el,binding, vnode) => {
+      if(binding.value) {
+          binding.instance.inputValue = parseFloat(binding.instance.inputValue).toFixed('2')
+      }
+    })
+    // provide
+    app.provide('userLogin', true)
+    // mount
+     const vm = app.mount('#app')
+    // unmount
+    // setTimeout(() => {
+    //   app.unmount()
+    // }, 1000)
+    // version
+    console.log('vue当前版本：' + app.version)
 </script>
 
 </html>

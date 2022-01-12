@@ -1,10 +1,35 @@
-const directiveTemplate = `<div><input v-focus v-model="inputValue" /></div>`
+// inject
+const injectTemplate = `<div>inject接受的值为{{ userLogin }}</div>`
+// directive
+const directiveTemplate = `<div><input :readonly="readonly" v-toFixed:readonly="readonly" v-model="inputValue" /><button @click="handleClick">切换只读状态</button></div>`
+const {
+    inject,
+    onMounted,
+    ref
+} = Vue
 export default {
     name: 'AppApiCom',
-    template: directiveTemplate,
+    // inject: ['userLogin'],
     data() {
         return {
-            inputValue: '自定义指令'
+            userLogin: false,
+            readonly: true,
+            inputValue: '123.12345'
         }
-    }
+    },
+    setup(props) {
+        const userLogin = ref(0)
+        return {
+            userLogin
+        }
+    },
+    methods: {
+        handleClick() {
+            this.readonly = !this.readonly
+        }
+    },
+    mounted() {
+
+    },
+    template: injectTemplate
 }
