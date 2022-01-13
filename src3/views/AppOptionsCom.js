@@ -57,6 +57,9 @@ const WatchCom = {
     template: watchTemplate
 }
 // expose
+const {
+    ref
+} = Vue
 const ExposeCom = {
     name: 'ExposeCom',
     // expose: ['exposeName'],
@@ -65,6 +68,16 @@ const ExposeCom = {
             name: 'name',
             exposeName: 'expose'
         }
+    },
+    setup() {
+        const name = ref('')
+        name.value = 'setupname'
+        return {
+            name
+        }
+    },
+    mounted() {
+        console.log(this.$data)
     },
     template: `<div>{{ name }} {{ exposeName }}</div>`
 }
