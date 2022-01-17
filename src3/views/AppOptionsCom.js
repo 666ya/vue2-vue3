@@ -1,8 +1,24 @@
+// render || template
+const {
+    h
+} = Vue
+const template = `<div> {{ templateTitle }} </div>`
+const RenderCom = {
+    render() {
+        return h('div', this.$slots.default())
+    },
+    data() {
+        return {
+            renderTitle: 'render函数渲染模板(优先级更高)',
+            templateTitle: 'tempalte模板'
+        }
+    },
+    template: template
+}
 // data
 const dataTemplate = `<div>{{ obj.b }}</div>`
 const DataCom = {
     name: 'DataCom',
-    expose: ['msg'],
     data() {
         return {
             msg: 'title',
@@ -18,7 +34,6 @@ const DataCom = {
     },
     template: dataTemplate
 }
-
 // watch
 const watchTemplate = `<div>{{ obj.b }}</div>`
 const WatchCom = {
@@ -62,7 +77,7 @@ const {
 } = Vue
 const ExposeCom = {
     name: 'ExposeCom',
-    // expose: ['exposeName'],
+    expose: ['exposeName'],
     data() {
         return {
             name: 'name',
@@ -76,21 +91,93 @@ const ExposeCom = {
             name
         }
     },
-    mounted() {
-        console.log(this.$data)
-    },
     template: `<div>{{ name }} {{ exposeName }}</div>`
 }
-
-export default {
-    name: 'AppOptionsCom',
+// extends
+const SourceCom = {
+    name: 'SourceCom',
+    // compilerOptions: {
+    //     comments: false,
+    //     delimiters: ['$((', '))']
+    // },
     components: {
-        DataCom,
-        WatchCom,
-        ExposeCom
+        DataCom
+    },
+    // directives: {
+    //     focus: (el) => {
+    //         el.focus()
+    //     }
+    // },
+    mixins: [DataCom],
+    provide: {
+        sourceProvide: 'sourceProvide'
+    },
+    // inject: ['sourceProvide'],
+    inheritAttrs: false,
+    props: {
+        sourcePropsTitle: {
+            type: String,
+            default: 'sourcePropsTitle'
+        }
+    },
+    emits: ['click'],
+    expose: ['sourceExposeData'],
+    setup() {
+        const sourceSetUpValue = ref('')
+        sourceSetUpValue.value = 'sourceSetUpValue'
+        return {
+            sourceSetUpValue
+        }
+    },
+    data() {
+        return {
+            sourceData: '源组件数据',
+            sourceExposeData: 'sourceExposeData'
+        }
+    },
+    computed: {
+        fullName() {
+            return 'name'
+        }
+    },
+    template: `<div><input v-focus v-model="sourceData" />sourceTempalte: {{ sourceData }}</div>`,
+    // render() {
+    //     console.log(this)
+    //     // console.log(this.sourceSetUpValue)
+    //     return h('div', this.sourceSetUpValue)
+    // }
+}
+const ExtendCom = {
+    name: 'ExtendCom',
+    // extends: SourceCom,
+    compilerOptions: {
+        comments: false,
+        delimiters: ['${', '}'],
+    },
+    data() {
+        return {
+            extendData: 'extendData'
+        }
     },
     mounted() {
-        console.log(this.$refs['expose'])
+        // console.log(this.$options)
     },
-    template: '<expose-com ref="expose"></expose-com>'
+    template: '<div>extendTempalte:{ extendData }</div>'
+}
+export default {
+    name: 'AppOptionsCom',
+    data() {
+        return {
+            extendData: 'qqq'
+        }
+    },
+    components: {
+        RenderCom,
+        DataCom,
+        WatchCom,
+        ExposeCom,
+        ExtendCom,
+        SourceCom
+    },
+    template: '<extend-com></extend-com>'
 }

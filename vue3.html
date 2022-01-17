@@ -50,7 +50,7 @@
     <div class="main">
       <aside>
         <ul>
-          <li v-for="(item,index) in apiList" :key="index">
+          <li v-for="(item,index) in apiList" :key="index" @click="curComponent = item.name">
             <h4>{{ item.title }}</h4>
           </li>
         </ul>
@@ -60,7 +60,7 @@
           <app-component></app-component>
         </div> -->
         <template v-for="(item,index) in apiList" :key="index">
-          <div v-if="item.component && curComponent === item.name" @click="curComponent = item.name">
+          <div v-if="item.component && curComponent === item.name">
             <h2>{{ item.title }}</h2>
             <Component :is="item.component"></Component>
           </div>
@@ -69,7 +69,7 @@
     </div>
   </div>
 </body>
-<script src="src3/assets/vue.global.js"></script>
+<script src="src3/assets/vue.global.prod.js"></script>
 <script type="module">
   import { toLowerCasePlugin } from './src3/plugins/index.js'
   // views
@@ -114,11 +114,11 @@
           //  name: 'AppConfigCom',
           //  component: AppConfigCom
           //  },
-          // {
-          //     title: '应用API',
-          //     name: 'AppApiCom',
-          //     component: AppApiCom
-          // },
+          {
+              title: '应用API',
+              name: 'AppApiCom',
+              component: AppApiCom
+          },
           {
             title: '选项',
             name: 'AppOptionsCom',
@@ -168,12 +168,23 @@
         msg: '全局组件'
         }
       },
+      mounted() {
+        console.log(this.$options)
+      },
       template: '<div>{{ msg }}</div>'
     })
     // 自定义指令
-    app.directive('focus', (el) => {
-     el.focus()
-     })
+    app.directive('focus', {
+      beforeMount(el) {
+        el.focus()
+      },
+      mounted(el) {
+        el.focus()
+      },
+      updated(el) {
+        el.focus()
+      }
+    })
     app.directive('toFixed', (el,binding, vnode) => {
       if(binding.value) {
           binding.instance.inputValue = parseFloat(binding.instance.inputValue).toFixed('2')
