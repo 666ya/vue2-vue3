@@ -108,13 +108,16 @@ const SourceCom = {
     //         el.focus()
     //     }
     // },
-    mixins: [DataCom],
+    // mixins: [DataCom],
     provide: {
         sourceProvide: 'sourceProvide'
     },
     // inject: ['sourceProvide'],
     inheritAttrs: false,
     props: {
+        foo: {
+            type: String
+        },
         sourcePropsTitle: {
             type: String,
             default: 'sourcePropsTitle'
@@ -140,7 +143,7 @@ const SourceCom = {
             return 'name'
         }
     },
-    template: `<div><input v-focus v-model="sourceData" />sourceTempalte: {{ sourceData }}</div>`,
+    template: `<div ref="source"><div><p>foo:{{ foo }} bar:{{ $attrs.bar }}</p></div><input v-focus v-model="sourceData" />sourceTempalte: {{ sourceData }}</div>`,
     // render() {
     //     console.log(this)
     //     // console.log(this.sourceSetUpValue)
@@ -149,20 +152,29 @@ const SourceCom = {
 }
 const ExtendCom = {
     name: 'ExtendCom',
-    // extends: SourceCom,
+    components: {
+        SourceCom
+    },
+    extends: SourceCom,
     compilerOptions: {
         comments: false,
         delimiters: ['${', '}'],
     },
     data() {
         return {
-            extendData: 'extendData'
+            extendData: 'extendData',
+            foo: 'foo',
+            bar: 'bar'
         }
     },
     mounted() {
+        setTimeout(() => {
+            this.foo = this.foo + 'string'
+            this.bar = this.bar + 'string'
+        }, 1000)
         // console.log(this.$options)
     },
-    template: '<div>extendTempalte:{ extendData }</div>'
+    template: '<div><source-com :foo="foo" :bar="bar"></source-com>extendTempalte:{ extendData }</div>'
 }
 export default {
     name: 'AppOptionsCom',

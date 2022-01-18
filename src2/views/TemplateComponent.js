@@ -86,21 +86,31 @@ const TemplateComponent = {
             isButtonDisabled: true
         }
     },
-    watch: {
-        obj: {
-            handler(val) {
-                console.log(val)
-            },
-            deep: true
-        }
-    },
+    // watch: {
+    //     obj: {
+    //         handler(val) {
+    //             console.log(val)
+    //         },
+    //         deep: true
+    //     }
+    // },
     methods: {
         handleWatch() {
             this.obj.a.name.list.push(5)
             //  this.obj.a.name.key = '测试改变'
         }
     },
+    created() {
+        this.rootProperty = 1
+        console.log(this.$data)
+    },
     mounted() {
+        // this.$set(this.obj, 'c', 2)
+        this.$set(this, 'rootProperty', 2)
+        // this.$set(this.obj, 'c', 2)
+        console.log(this.rootProperty)
+        // console.log(this.$data)
+        // this.rootProperyt++
         // this.obj.b = 2
         // setTimeout(() => {
         //     this.$set(this.obj, 'b', 3)
@@ -111,7 +121,8 @@ const TemplateComponent = {
         <div>
             <parent-com></parent-com>
             <button v-bind:disabled="isButtonDisabled">属性值</button>
-            <div>对象值为：{{ obj.b }}</div>
+            <div>对象值为：{{ obj.c }}</div>
+            <div>根数据对象：{{ rootProperty  }}</div>
             <div>
                 <span>{{ obj.a.name.key }}</span>
                 <span>{{ msg }}</span>

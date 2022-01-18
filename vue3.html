@@ -41,6 +41,11 @@
     template {
       display: inline-block;
     }
+
+    .rootEle {
+      border: 1px solid #333;
+      margin: 10px 0;
+    }
   </style>
 </head>
 
@@ -76,7 +81,10 @@
   import AppConfigCom from './src3/views/AppConfigCom.js'
   import AppApiCom from './src3/views/AppApiCom.js'
   import AppOptionsCom from './src3/views/AppOptionsCom.js'
+  import InstancePropertyCom from './src3/views/InstancePropertyCom.js'
   import CompositeCom from "./src3/views/CompositeCom.js";
+
+
   import DiffComponent from './diffcomponent/DiffComponent.js'
   import SlotCom from "./src3/views/SlotCom.js";
 
@@ -97,7 +105,7 @@
         user: '张三',
         ok: false,
         title: 'Vue3',
-        curComponent: 'AppOptionsCom',
+        curComponent: 'InstancePropertyCom',
         apiList: [
           // {
           //   title: '插槽',
@@ -123,6 +131,11 @@
             title: '选项',
             name: 'AppOptionsCom',
             component: AppOptionsCom
+          },
+          {
+             title: '实例property',
+             name: 'InstancePropertyCom',
+            component: InstancePropertyCom
           },
           //  {
           //     title: '非兼容变更',
