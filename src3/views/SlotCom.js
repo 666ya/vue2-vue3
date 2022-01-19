@@ -28,4 +28,3 @@ export default {
 <!--                <template v-slot:footer="footerProps">尾部{{ footerProps }}</template>-->
             </todo-list>`
 }
-
