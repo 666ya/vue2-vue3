@@ -19,12 +19,11 @@ const ForceUpdateCom = {
         ChildCom,
         ChildHasSlotCom
     },
-    // mounted() {
-    //     // console.log('绑定')
-    //     setTimeout(() => {
-    //         this.$forceUpdate()
-    //     }, 2000)
-    // },
+    mounted() {
+        setTimeout(() => {
+            this.$forceUpdate()
+        }, 2000)
+    },
     updated() {
         console.log('实例本身更新了')
     },
@@ -96,10 +95,5 @@ export default {
             title: ''
         }
     },
-    // mounted() {
-    //     setTimeout(() => {
-    //         this.title = '实例$watch方法'
-    //     }, 2000)
-    // },
     template: `<force-update-com></force-update-com>`
 }

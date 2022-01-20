@@ -47,6 +47,22 @@
       margin: 10px 0;
     }
   </style>
+  <style>
+    /* transiton动画 */
+    .fade-enter-from,
+    .fade-leave-to {
+      transform: translateX(20px);
+      opacity: 0;
+    }
+
+    .slide-fade-enter-active {
+      transition: all 0.3s ease-out;
+    }
+
+    .slide-fade-leave-active {
+      transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+    }
+  </style>
 </head>
 
 <body>
@@ -74,7 +90,9 @@
     </div>
   </div>
 </body>
-<script src="src3/assets/vue.global.prod.js"></script>
+<script src="src3/assets/vue.global.js"></script>
+<!-- <script src="src3/assets/vue.global.prod.js"></script> -->
+
 <script type="module">
   import { toLowerCasePlugin } from './src3/plugins/index.js'
   // views
@@ -83,8 +101,10 @@
   import AppOptionsCom from './src3/views/AppOptionsCom.js'
   import InstancePropertyCom from './src3/views/InstancePropertyCom.js'
   import InstanceOperatorCom from './src3/views/InstanceOperatorCom.js'
-  import CompositeCom from "./src3/views/CompositeCom.js";
+  import AppDirectivesCom from './src3/views/AppDirectivesCom.js'
+  import BuiltInCom from './src3/views/BuiltInCom.js'
 
+  import CompositeCom from "./src3/views/CompositeCom.js";
 
   import DiffComponent from './diffcomponent/DiffComponent.js'
   import SlotCom from "./src3/views/SlotCom.js";
@@ -97,7 +117,8 @@
       AppConfigCom,
       AppApiCom,
       AppOptionsCom,
-      InstanceOperatorCom
+      InstanceOperatorCom,
+      AppDirectivesCom
     },
     data() {
       return {
@@ -107,7 +128,7 @@
         user: '张三',
         ok: false,
         title: 'Vue3',
-        curComponent: 'InstanceOperatorCom',
+        curComponent: 'BuiltInCom',
         apiList: [
           // {
           //   title: '插槽',
@@ -124,25 +145,35 @@
           //  name: 'AppConfigCom',
           //  component: AppConfigCom
           //  },
-          {
-              title: '应用API',
-              name: 'AppApiCom',
-              component: AppApiCom
-          },
-          {
-            title: '选项',
-            name: 'AppOptionsCom',
-            component: AppOptionsCom
-          },
-          {
-             title: '实例property',
-             name: 'InstancePropertyCom',
-            component: InstancePropertyCom
-          },
+          // {
+          //     title: '应用API',
+          //     name: 'AppApiCom',
+          //     component: AppApiCom
+          // },
+          // {
+          //   title: '选项',
+          //   name: 'AppOptionsCom',
+          //   component: AppOptionsCom
+          // },
+          // {
+          //    title: '实例property',
+          //    name: 'InstancePropertyCom',
+          //   component: InstancePropertyCom
+          // },
+          //  {
+          //  title: '实例方法',
+          //  name: 'InstanceOperatorCom',
+          //  component: InstanceOperatorCom
+          //  },
+          // {
+          //   title: '指令',
+          //   name: 'AppDirectivesCom',
+          //   component: AppDirectivesCom
+          // },
            {
-           title: '实例方法',
-           name: 'InstanceOperatorCom',
-           component: InstanceOperatorCom
+           title: '内置组件',
+           name: 'BuiltInCom',
+           component: BuiltInCom
            },
           //  {
           //     title: '非兼容变更',
