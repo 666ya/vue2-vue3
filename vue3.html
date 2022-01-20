@@ -49,19 +49,31 @@
   </style>
   <style>
     /* transiton动画 */
-    .fade-enter-from,
-    .fade-leave-to {
-      transform: translateX(20px);
-      opacity: 0;
+    .fade-enter-from {
+      font-size: 30px;
     }
 
-    .slide-fade-enter-active {
+    .fade-enter-active {
+      color: red;
+      transition: color 10s linear;
+    }
+
+    .fade-enter-to {
+      font-size: 12px;
+    }
+
+    /* .fade-leave-to {
+      transform: translateX(20px);
+      opacity: 0;
+    } */
+
+    /* .slide-fade-enter-active {
       transition: all 0.3s ease-out;
     }
 
     .slide-fade-leave-active {
       transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-    }
+    } */
   </style>
 </head>
 

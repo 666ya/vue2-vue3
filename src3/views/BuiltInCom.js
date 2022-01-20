@@ -51,7 +51,7 @@ const TransitionCom = {
     },
     template: `
         <div>
-            <transition>
+            <transition  appear :css="false" name = "fade": duration = "1000" >
                 <p v-if="show">transiton内置组件</p>
             </transition>
             <button @click="show = !show">切换</button>
