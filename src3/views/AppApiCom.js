@@ -10,6 +10,8 @@ const {
     onMounted,
     ref
 } = Vue
+
+// 应用API
 export default {
     name: 'AppApiCom',
     inject: ['userLogin', 'toLowerCaseProvide'],

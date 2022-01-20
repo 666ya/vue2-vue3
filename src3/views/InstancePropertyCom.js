@@ -104,6 +104,8 @@ const ParentCom = {
     },
     template: '<div><child-com ref="cildCom" :foo="foo" :bar="bar" v-on:click="handleClick" @selfClick="handleSelfClick"></child-com>extendTempalte:{ extendData }</div>'
 }
+
+// 实例property
 export default {
     name: 'InstancePropertyCom',
     data() {

@@ -1,6 +1,11 @@
 import useList from '../composables/useList.js'
 import useNameSearch from "../composables/useNameSearch.js";
-const { toRefs } = Vue
+const {
+  toRefs
+} = Vue
+
+
+// 组合API
 export default {
   name: 'CompositeCom',
   props: {
@@ -10,9 +15,17 @@ export default {
     }
   },
   setup(props) {
-    const { user } = toRefs(props)
-    const { list, getList } = useList(user)
-    const { filterText, filterList } = useNameSearch(list)
+    const {
+      user
+    } = toRefs(props)
+    const {
+      list,
+      getList
+    } = useList(user)
+    const {
+      filterText,
+      filterList
+    } = useNameSearch(list)
     return {
       filterText,
       filterList

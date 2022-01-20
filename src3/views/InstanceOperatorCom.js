@@ -84,8 +84,10 @@ const WatchCom = {
     },
     template: `<div>{{ propsWatchValue }}</div>`
 }
+
+// 实例方法
 export default {
-    name: 'InstanceOperatorCom',
+    name: 'InstanceMethodsCom',
     components: {
         // WatchCom,
         ForceUpdateCom

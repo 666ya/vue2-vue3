@@ -176,6 +176,9 @@ const ExtendCom = {
     },
     template: '<div><source-com :foo="foo" :bar="bar"></source-com>extendTempalte:{ extendData }</div>'
 }
+
+
+// 应用选项
 export default {
     name: 'AppOptionsCom',
     data() {
