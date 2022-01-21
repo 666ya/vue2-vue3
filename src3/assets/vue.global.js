@@ -207,7 +207,7 @@ var Vue = (function (exports) {
       'foreignObject,g,hatch,hatchpath,image,line,linearGradient,marker,mask,' +
       'mesh,meshgradient,meshpatch,meshrow,metadata,mpath,path,pattern,' +
       'polygon,polyline,radialGradient,rect,set,solidcolor,stop,switch,symbol,' +
-      'text,textPath,title,tspan,unknown,use,views';
+      'text,textPath,title,tspan,unknown,use,view';
   const VOID_TAGS = 'area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr';
   const isHTMLTag = /*#__PURE__*/ makeMap(HTML_TAGS);
   const isSVGTag = /*#__PURE__*/ makeMap(SVG_TAGS);
@@ -1267,7 +1267,7 @@ var Vue = (function (exports) {
    * Returns a reactive-copy of the original object, where only the root level
    * properties are readonly, and does NOT unwrap refs nor recursively convert
    * returned properties.
-   * This is used for creating the props proxy object for stateful src2.
+   * This is used for creating the props proxy object for stateful components.
    */
   function shallowReadonly(target) {
       return createReactiveObject(target, true, shallowReadonlyHandlers, shallowReadonlyCollectionHandlers, shallowReadonlyMap);
@@ -1461,7 +1461,7 @@ var Vue = (function (exports) {
   }
 
   class ComputedRefImpl {
-      constructor(getter, _setter, isReadonly) {
+      constructor(getter, _setter, isReadonly, isSSR) {
           this._setter = _setter;
           this.dep = undefined;
           this._dirty = true;
@@ -1472,6 +1472,7 @@ var Vue = (function (exports) {
                   triggerRefValue(this);
               }
           });
+          this.effect.active = !isSSR;
           this["__v_isReadonly" /* IS_READONLY */] = isReadonly;
       }
       get value() {
@@ -1488,7 +1489,7 @@ var Vue = (function (exports) {
           this._setter(newValue);
       }
   }
-  function computed(getterOrOptions, debugOptions) {
+  function computed(getterOrOptions, debugOptions, isSSR = false) {
       let getter;
       let setter;
       const onlyGetter = isFunction(getterOrOptions);
@@ -1503,12 +1504,434 @@ var Vue = (function (exports) {
           getter = getterOrOptions.get;
           setter = getterOrOptions.set;
       }
-      const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter);
-      if (debugOptions) {
+      const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter, isSSR);
+      if (debugOptions && !isSSR) {
           cRef.effect.onTrack = debugOptions.onTrack;
           cRef.effect.onTrigger = debugOptions.onTrigger;
       }
       return cRef;
+  }
+
+  const stack = [];
+  function pushWarningContext(vnode) {
+      stack.push(vnode);
+  }
+  function popWarningContext() {
+      stack.pop();
+  }
+  function warn$1(msg, ...args) {
+      // avoid props formatting or warn handler tracking deps that might be mutated
+      // during patch, leading to infinite recursion.
+      pauseTracking();
+      const instance = stack.length ? stack[stack.length - 1].component : null;
+      const appWarnHandler = instance && instance.appContext.config.warnHandler;
+      const trace = getComponentTrace();
+      if (appWarnHandler) {
+          callWithErrorHandling(appWarnHandler, instance, 11 /* APP_WARN_HANDLER */, [
+              msg + args.join(''),
+              instance && instance.proxy,
+              trace
+                  .map(({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`)
+                  .join('\n'),
+              trace
+          ]);
+      }
+      else {
+          const warnArgs = [`[Vue warn]: ${msg}`, ...args];
+          /* istanbul ignore if */
+          if (trace.length &&
+              // avoid spamming console during tests
+              !false) {
+              warnArgs.push(`\n`, ...formatTrace(trace));
+          }
+          console.warn(...warnArgs);
+      }
+      resetTracking();
+  }
+  function getComponentTrace() {
+      let currentVNode = stack[stack.length - 1];
+      if (!currentVNode) {
+          return [];
+      }
+      // we can't just use the stack because it will be incomplete during updates
+      // that did not start from the root. Re-construct the parent chain using
+      // instance parent pointers.
+      const normalizedStack = [];
+      while (currentVNode) {
+          const last = normalizedStack[0];
+          if (last && last.vnode === currentVNode) {
+              last.recurseCount++;
+          }
+          else {
+              normalizedStack.push({
+                  vnode: currentVNode,
+                  recurseCount: 0
+              });
+          }
+          const parentInstance = currentVNode.component && currentVNode.component.parent;
+          currentVNode = parentInstance && parentInstance.vnode;
+      }
+      return normalizedStack;
+  }
+  /* istanbul ignore next */
+  function formatTrace(trace) {
+      const logs = [];
+      trace.forEach((entry, i) => {
+          logs.push(...(i === 0 ? [] : [`\n`]), ...formatTraceEntry(entry));
+      });
+      return logs;
+  }
+  function formatTraceEntry({ vnode, recurseCount }) {
+      const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
+      const isRoot = vnode.component ? vnode.component.parent == null : false;
+      const open = ` at <${formatComponentName(vnode.component, vnode.type, isRoot)}`;
+      const close = `>` + postfix;
+      return vnode.props
+          ? [open, ...formatProps(vnode.props), close]
+          : [open + close];
+  }
+  /* istanbul ignore next */
+  function formatProps(props) {
+      const res = [];
+      const keys = Object.keys(props);
+      keys.slice(0, 3).forEach(key => {
+          res.push(...formatProp(key, props[key]));
+      });
+      if (keys.length > 3) {
+          res.push(` ...`);
+      }
+      return res;
+  }
+  /* istanbul ignore next */
+  function formatProp(key, value, raw) {
+      if (isString(value)) {
+          value = JSON.stringify(value);
+          return raw ? value : [`${key}=${value}`];
+      }
+      else if (typeof value === 'number' ||
+          typeof value === 'boolean' ||
+          value == null) {
+          return raw ? value : [`${key}=${value}`];
+      }
+      else if (isRef(value)) {
+          value = formatProp(key, toRaw(value.value), true);
+          return raw ? value : [`${key}=Ref<`, value, `>`];
+      }
+      else if (isFunction(value)) {
+          return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
+      }
+      else {
+          value = toRaw(value);
+          return raw ? value : [`${key}=`, value];
+      }
+  }
+
+  const ErrorTypeStrings = {
+      ["sp" /* SERVER_PREFETCH */]: 'serverPrefetch hook',
+      ["bc" /* BEFORE_CREATE */]: 'beforeCreate hook',
+      ["c" /* CREATED */]: 'created hook',
+      ["bm" /* BEFORE_MOUNT */]: 'beforeMount hook',
+      ["m" /* MOUNTED */]: 'mounted hook',
+      ["bu" /* BEFORE_UPDATE */]: 'beforeUpdate hook',
+      ["u" /* UPDATED */]: 'updated',
+      ["bum" /* BEFORE_UNMOUNT */]: 'beforeUnmount hook',
+      ["um" /* UNMOUNTED */]: 'unmounted hook',
+      ["a" /* ACTIVATED */]: 'activated hook',
+      ["da" /* DEACTIVATED */]: 'deactivated hook',
+      ["ec" /* ERROR_CAPTURED */]: 'errorCaptured hook',
+      ["rtc" /* RENDER_TRACKED */]: 'renderTracked hook',
+      ["rtg" /* RENDER_TRIGGERED */]: 'renderTriggered hook',
+      [0 /* SETUP_FUNCTION */]: 'setup function',
+      [1 /* RENDER_FUNCTION */]: 'render function',
+      [2 /* WATCH_GETTER */]: 'watcher getter',
+      [3 /* WATCH_CALLBACK */]: 'watcher callback',
+      [4 /* WATCH_CLEANUP */]: 'watcher cleanup function',
+      [5 /* NATIVE_EVENT_HANDLER */]: 'native event handler',
+      [6 /* COMPONENT_EVENT_HANDLER */]: 'component event handler',
+      [7 /* VNODE_HOOK */]: 'vnode hook',
+      [8 /* DIRECTIVE_HOOK */]: 'directive hook',
+      [9 /* TRANSITION_HOOK */]: 'transition hook',
+      [10 /* APP_ERROR_HANDLER */]: 'app errorHandler',
+      [11 /* APP_WARN_HANDLER */]: 'app warnHandler',
+      [12 /* FUNCTION_REF */]: 'ref function',
+      [13 /* ASYNC_COMPONENT_LOADER */]: 'async component loader',
+      [14 /* SCHEDULER */]: 'scheduler flush. This is likely a Vue internals bug. ' +
+          'Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/vue-next'
+  };
+  function callWithErrorHandling(fn, instance, type, args) {
+      let res;
+      try {
+          res = args ? fn(...args) : fn();
+      }
+      catch (err) {
+          handleError(err, instance, type);
+      }
+      return res;
+  }
+  function callWithAsyncErrorHandling(fn, instance, type, args) {
+      if (isFunction(fn)) {
+          const res = callWithErrorHandling(fn, instance, type, args);
+          if (res && isPromise(res)) {
+              res.catch(err => {
+                  handleError(err, instance, type);
+              });
+          }
+          return res;
+      }
+      const values = [];
+      for (let i = 0; i < fn.length; i++) {
+          values.push(callWithAsyncErrorHandling(fn[i], instance, type, args));
+      }
+      return values;
+  }
+  function handleError(err, instance, type, throwInDev = true) {
+      const contextVNode = instance ? instance.vnode : null;
+      if (instance) {
+          let cur = instance.parent;
+          // the exposed instance is the render proxy to keep it consistent with 2.x
+          const exposedInstance = instance.proxy;
+          // in production the hook receives only the error code
+          const errorInfo = ErrorTypeStrings[type] ;
+          while (cur) {
+              const errorCapturedHooks = cur.ec;
+              if (errorCapturedHooks) {
+                  for (let i = 0; i < errorCapturedHooks.length; i++) {
+                      if (errorCapturedHooks[i](err, exposedInstance, errorInfo) === false) {
+                          return;
+                      }
+                  }
+              }
+              cur = cur.parent;
+          }
+          // app-level handling
+          const appErrorHandler = instance.appContext.config.errorHandler;
+          if (appErrorHandler) {
+              callWithErrorHandling(appErrorHandler, null, 10 /* APP_ERROR_HANDLER */, [err, exposedInstance, errorInfo]);
+              return;
+          }
+      }
+      logError(err, type, contextVNode, throwInDev);
+  }
+  function logError(err, type, contextVNode, throwInDev = true) {
+      {
+          const info = ErrorTypeStrings[type];
+          if (contextVNode) {
+              pushWarningContext(contextVNode);
+          }
+          warn$1(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
+          if (contextVNode) {
+              popWarningContext();
+          }
+          // crash in dev by default so it's more noticeable
+          if (throwInDev) {
+              throw err;
+          }
+          else {
+              console.error(err);
+          }
+      }
+  }
+
+  let isFlushing = false;
+  let isFlushPending = false;
+  const queue = [];
+  let flushIndex = 0;
+  const pendingPreFlushCbs = [];
+  let activePreFlushCbs = null;
+  let preFlushIndex = 0;
+  const pendingPostFlushCbs = [];
+  let activePostFlushCbs = null;
+  let postFlushIndex = 0;
+  const resolvedPromise = Promise.resolve();
+  let currentFlushPromise = null;
+  let currentPreFlushParentJob = null;
+  const RECURSION_LIMIT = 100;
+  function nextTick(fn) {
+      const p = currentFlushPromise || resolvedPromise;
+      return fn ? p.then(this ? fn.bind(this) : fn) : p;
+  }
+  // #2768
+  // Use binary-search to find a suitable position in the queue,
+  // so that the queue maintains the increasing order of job's id,
+  // which can prevent the job from being skipped and also can avoid repeated patching.
+  function findInsertionIndex(id) {
+      // the start index should be `flushIndex + 1`
+      let start = flushIndex + 1;
+      let end = queue.length;
+      while (start < end) {
+          const middle = (start + end) >>> 1;
+          const middleJobId = getId(queue[middle]);
+          middleJobId < id ? (start = middle + 1) : (end = middle);
+      }
+      return start;
+  }
+  function queueJob(job) {
+      // the dedupe search uses the startIndex argument of Array.includes()
+      // by default the search index includes the current job that is being run
+      // so it cannot recursively trigger itself again.
+      // if the job is a watch() callback, the search will start with a +1 index to
+      // allow it recursively trigger itself - it is the user's responsibility to
+      // ensure it doesn't end up in an infinite loop.
+      if ((!queue.length ||
+          !queue.includes(job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex)) &&
+          job !== currentPreFlushParentJob) {
+          if (job.id == null) {
+              queue.push(job);
+          }
+          else {
+              queue.splice(findInsertionIndex(job.id), 0, job);
+          }
+          queueFlush();
+      }
+  }
+  function queueFlush() {
+      if (!isFlushing && !isFlushPending) {
+          isFlushPending = true;
+          currentFlushPromise = resolvedPromise.then(flushJobs);
+      }
+  }
+  function invalidateJob(job) {
+      const i = queue.indexOf(job);
+      if (i > flushIndex) {
+          queue.splice(i, 1);
+      }
+  }
+  function queueCb(cb, activeQueue, pendingQueue, index) {
+      if (!isArray(cb)) {
+          if (!activeQueue ||
+              !activeQueue.includes(cb, cb.allowRecurse ? index + 1 : index)) {
+              pendingQueue.push(cb);
+          }
+      }
+      else {
+          // if cb is an array, it is a component lifecycle hook which can only be
+          // triggered by a job, which is already deduped in the main queue, so
+          // we can skip duplicate check here to improve perf
+          pendingQueue.push(...cb);
+      }
+      queueFlush();
+  }
+  function queuePreFlushCb(cb) {
+      queueCb(cb, activePreFlushCbs, pendingPreFlushCbs, preFlushIndex);
+  }
+  function queuePostFlushCb(cb) {
+      queueCb(cb, activePostFlushCbs, pendingPostFlushCbs, postFlushIndex);
+  }
+  function flushPreFlushCbs(seen, parentJob = null) {
+      if (pendingPreFlushCbs.length) {
+          currentPreFlushParentJob = parentJob;
+          activePreFlushCbs = [...new Set(pendingPreFlushCbs)];
+          pendingPreFlushCbs.length = 0;
+          {
+              seen = seen || new Map();
+          }
+          for (preFlushIndex = 0; preFlushIndex < activePreFlushCbs.length; preFlushIndex++) {
+              if (checkRecursiveUpdates(seen, activePreFlushCbs[preFlushIndex])) {
+                  continue;
+              }
+              activePreFlushCbs[preFlushIndex]();
+          }
+          activePreFlushCbs = null;
+          preFlushIndex = 0;
+          currentPreFlushParentJob = null;
+          // recursively flush until it drains
+          flushPreFlushCbs(seen, parentJob);
+      }
+  }
+  function flushPostFlushCbs(seen) {
+      if (pendingPostFlushCbs.length) {
+          const deduped = [...new Set(pendingPostFlushCbs)];
+          pendingPostFlushCbs.length = 0;
+          // #1947 already has active queue, nested flushPostFlushCbs call
+          if (activePostFlushCbs) {
+              activePostFlushCbs.push(...deduped);
+              return;
+          }
+          activePostFlushCbs = deduped;
+          {
+              seen = seen || new Map();
+          }
+          activePostFlushCbs.sort((a, b) => getId(a) - getId(b));
+          for (postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++) {
+              if (checkRecursiveUpdates(seen, activePostFlushCbs[postFlushIndex])) {
+                  continue;
+              }
+              activePostFlushCbs[postFlushIndex]();
+          }
+          activePostFlushCbs = null;
+          postFlushIndex = 0;
+      }
+  }
+  const getId = (job) => job.id == null ? Infinity : job.id;
+  function flushJobs(seen) {
+      isFlushPending = false;
+      isFlushing = true;
+      {
+          seen = seen || new Map();
+      }
+      flushPreFlushCbs(seen);
+      // Sort queue before flush.
+      // This ensures that:
+      // 1. Components are updated from parent to child. (because parent is always
+      //    created before the child so its render effect will have smaller
+      //    priority number)
+      // 2. If a component is unmounted during a parent component's update,
+      //    its update can be skipped.
+      queue.sort((a, b) => getId(a) - getId(b));
+      // conditional usage of checkRecursiveUpdate must be determined out of
+      // try ... catch block since Rollup by default de-optimizes treeshaking
+      // inside try-catch. This can leave all warning code unshaked. Although
+      // they would get eventually shaken by a minifier like terser, some minifiers
+      // would fail to do that (e.g. https://github.com/evanw/esbuild/issues/1610)
+      const check = (job) => checkRecursiveUpdates(seen, job)
+          ;
+      try {
+          for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+              const job = queue[flushIndex];
+              if (job && job.active !== false) {
+                  if (true && check(job)) {
+                      continue;
+                  }
+                  // console.log(`running:`, job.id)
+                  callWithErrorHandling(job, null, 14 /* SCHEDULER */);
+              }
+          }
+      }
+      finally {
+          flushIndex = 0;
+          queue.length = 0;
+          flushPostFlushCbs(seen);
+          isFlushing = false;
+          currentFlushPromise = null;
+          // some postFlushCb queued jobs!
+          // keep flushing until it drains.
+          if (queue.length ||
+              pendingPreFlushCbs.length ||
+              pendingPostFlushCbs.length) {
+              flushJobs(seen);
+          }
+      }
+  }
+  function checkRecursiveUpdates(seen, fn) {
+      if (!seen.has(fn)) {
+          seen.set(fn, 1);
+      }
+      else {
+          const count = seen.get(fn);
+          if (count > RECURSION_LIMIT) {
+              const instance = fn.ownerInstance;
+              const componentName = instance && getComponentName(instance.type);
+              warn$1(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. ` +
+                  `This means you have a reactive effect that is mutating its own ` +
+                  `dependencies and thus recursively triggering itself. Possible sources ` +
+                  `include component template, render function, updated hook or ` +
+                  `watcher source function.`);
+              return true;
+          }
+          else {
+              seen.set(fn, count + 1);
+          }
+      }
   }
 
   /* eslint-disable no-restricted-globals */
@@ -1565,7 +1988,7 @@ var Vue = (function (exports) {
               normalizeClassComponent(instance.type).render = newRender;
           }
           instance.renderCache = [];
-          // this flag forces child src2 with slot content to update
+          // this flag forces child components with slot content to update
           isHmrUpdating = true;
           instance.update();
           isHmrUpdating = false;
@@ -1576,7 +1999,7 @@ var Vue = (function (exports) {
       if (!record)
           return;
       newComp = normalizeClassComponent(newComp);
-      // update initial def (for not-yet-rendered src2)
+      // update initial def (for not-yet-rendered components)
       updateComponentDef(record.initialDef, newComp);
       // create a snapshot which avoids the set being mutated during updates
       const instances = [...record.instances];
@@ -1602,7 +2025,7 @@ var Vue = (function (exports) {
           }
           else if (instance.parent) {
               // 4. Force the parent instance to re-render. This will cause all updated
-              // src2 to be unmounted and re-mounted. Queue the update so that we
+              // components to be unmounted and re-mounted. Queue the update so that we
               // don't end up forcing the same parent to re-render multiple times.
               queueJob(instance.parent.update);
               // instance is the inner component of an async custom element
@@ -1624,7 +2047,7 @@ var Vue = (function (exports) {
               console.warn('[HMR] Root or manually mounted instance modified. Full reload required.');
           }
       }
-      // 5. make sure to cleanup dirty hmr src2 after update
+      // 5. make sure to cleanup dirty hmr components after update
       queuePostFlushCb(() => {
           for (const instance of instances) {
               hmrDirtyComponents.delete(normalizeClassComponent(instance.type));
@@ -2716,6 +3139,255 @@ var Vue = (function (exports) {
       }
   }
 
+  // Simple effect.
+  function watchEffect(effect, options) {
+      return doWatch(effect, null, options);
+  }
+  function watchPostEffect(effect, options) {
+      return doWatch(effect, null, (Object.assign(options || {}, { flush: 'post' })
+          ));
+  }
+  function watchSyncEffect(effect, options) {
+      return doWatch(effect, null, (Object.assign(options || {}, { flush: 'sync' })
+          ));
+  }
+  // initial value for watchers to trigger on undefined initial values
+  const INITIAL_WATCHER_VALUE = {};
+  // implementation
+  function watch(source, cb, options) {
+      if (!isFunction(cb)) {
+          warn$1(`\`watch(fn, options?)\` signature has been moved to a separate API. ` +
+              `Use \`watchEffect(fn, options?)\` instead. \`watch\` now only ` +
+              `supports \`watch(source, cb, options?) signature.`);
+      }
+      return doWatch(source, cb, options);
+  }
+  function doWatch(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ) {
+      if (!cb) {
+          if (immediate !== undefined) {
+              warn$1(`watch() "immediate" option is only respected when using the ` +
+                  `watch(source, callback, options?) signature.`);
+          }
+          if (deep !== undefined) {
+              warn$1(`watch() "deep" option is only respected when using the ` +
+                  `watch(source, callback, options?) signature.`);
+          }
+      }
+      const warnInvalidSource = (s) => {
+          warn$1(`Invalid watch source: `, s, `A watch source can only be a getter/effect function, a ref, ` +
+              `a reactive object, or an array of these types.`);
+      };
+      const instance = currentInstance;
+      let getter;
+      let forceTrigger = false;
+      let isMultiSource = false;
+      if (isRef(source)) {
+          getter = () => source.value;
+          forceTrigger = !!source._shallow;
+      }
+      else if (isReactive(source)) {
+          getter = () => source;
+          deep = true;
+      }
+      else if (isArray(source)) {
+          isMultiSource = true;
+          forceTrigger = source.some(isReactive);
+          getter = () => source.map(s => {
+              if (isRef(s)) {
+                  return s.value;
+              }
+              else if (isReactive(s)) {
+                  return traverse(s);
+              }
+              else if (isFunction(s)) {
+                  return callWithErrorHandling(s, instance, 2 /* WATCH_GETTER */);
+              }
+              else {
+                  warnInvalidSource(s);
+              }
+          });
+      }
+      else if (isFunction(source)) {
+          if (cb) {
+              // getter with cb
+              getter = () => callWithErrorHandling(source, instance, 2 /* WATCH_GETTER */);
+          }
+          else {
+              // no cb -> simple effect
+              getter = () => {
+                  if (instance && instance.isUnmounted) {
+                      return;
+                  }
+                  if (cleanup) {
+                      cleanup();
+                  }
+                  return callWithAsyncErrorHandling(source, instance, 3 /* WATCH_CALLBACK */, [onCleanup]);
+              };
+          }
+      }
+      else {
+          getter = NOOP;
+          warnInvalidSource(source);
+      }
+      if (cb && deep) {
+          const baseGetter = getter;
+          getter = () => traverse(baseGetter());
+      }
+      let cleanup;
+      let onCleanup = (fn) => {
+          cleanup = effect.onStop = () => {
+              callWithErrorHandling(fn, instance, 4 /* WATCH_CLEANUP */);
+          };
+      };
+      let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE;
+      const job = () => {
+          if (!effect.active) {
+              return;
+          }
+          if (cb) {
+              // watch(source, cb)
+              const newValue = effect.run();
+              if (deep ||
+                  forceTrigger ||
+                  (isMultiSource
+                      ? newValue.some((v, i) => hasChanged(v, oldValue[i]))
+                      : hasChanged(newValue, oldValue)) ||
+                  (false  )) {
+                  // cleanup before running cb again
+                  if (cleanup) {
+                      cleanup();
+                  }
+                  callWithAsyncErrorHandling(cb, instance, 3 /* WATCH_CALLBACK */, [
+                      newValue,
+                      // pass undefined as the old value when it's changed for the first time
+                      oldValue === INITIAL_WATCHER_VALUE ? undefined : oldValue,
+                      onCleanup
+                  ]);
+                  oldValue = newValue;
+              }
+          }
+          else {
+              // watchEffect
+              effect.run();
+          }
+      };
+      // important: mark the job as a watcher callback so that scheduler knows
+      // it is allowed to self-trigger (#1727)
+      job.allowRecurse = !!cb;
+      let scheduler;
+      if (flush === 'sync') {
+          scheduler = job; // the scheduler function gets called directly
+      }
+      else if (flush === 'post') {
+          scheduler = () => queuePostRenderEffect(job, instance && instance.suspense);
+      }
+      else {
+          // default: 'pre'
+          scheduler = () => {
+              if (!instance || instance.isMounted) {
+                  queuePreFlushCb(job);
+              }
+              else {
+                  // with 'pre' option, the first call must happen before
+                  // the component is mounted so it is called synchronously.
+                  job();
+              }
+          };
+      }
+      const effect = new ReactiveEffect(getter, scheduler);
+      {
+          effect.onTrack = onTrack;
+          effect.onTrigger = onTrigger;
+      }
+      // initial run
+      if (cb) {
+          if (immediate) {
+              job();
+          }
+          else {
+              oldValue = effect.run();
+          }
+      }
+      else if (flush === 'post') {
+          queuePostRenderEffect(effect.run.bind(effect), instance && instance.suspense);
+      }
+      else {
+          effect.run();
+      }
+      return () => {
+          effect.stop();
+          if (instance && instance.scope) {
+              remove(instance.scope.effects, effect);
+          }
+      };
+  }
+  // this.$watch
+  function instanceWatch(source, value, options) {
+      const publicThis = this.proxy;
+      const getter = isString(source)
+          ? source.includes('.')
+              ? createPathGetter(publicThis, source)
+              : () => publicThis[source]
+          : source.bind(publicThis, publicThis);
+      let cb;
+      if (isFunction(value)) {
+          cb = value;
+      }
+      else {
+          cb = value.handler;
+          options = value;
+      }
+      const cur = currentInstance;
+      setCurrentInstance(this);
+      const res = doWatch(getter, cb.bind(publicThis), options);
+      if (cur) {
+          setCurrentInstance(cur);
+      }
+      else {
+          unsetCurrentInstance();
+      }
+      return res;
+  }
+  function createPathGetter(ctx, path) {
+      const segments = path.split('.');
+      return () => {
+          let cur = ctx;
+          for (let i = 0; i < segments.length && cur; i++) {
+              cur = cur[segments[i]];
+          }
+          return cur;
+      };
+  }
+  function traverse(value, seen) {
+      if (!isObject(value) || value["__v_skip" /* SKIP */]) {
+          return value;
+      }
+      seen = seen || new Set();
+      if (seen.has(value)) {
+          return value;
+      }
+      seen.add(value);
+      if (isRef(value)) {
+          traverse(value.value, seen);
+      }
+      else if (isArray(value)) {
+          for (let i = 0; i < value.length; i++) {
+              traverse(value[i], seen);
+          }
+      }
+      else if (isSet(value) || isMap(value)) {
+          value.forEach((v) => {
+              traverse(v, seen);
+          });
+      }
+      else if (isPlainObject(value)) {
+          for (const key in value) {
+              traverse(value[key], seen);
+          }
+      }
+      return value;
+  }
+
   function useTransitionState() {
       const state = {
           isMounted: false,
@@ -3222,7 +3894,7 @@ var Vue = (function (exports) {
                   }
               }, parentSuspense);
               {
-                  // Update src2 tree
+                  // Update components tree
                   devtoolsComponentAdded(instance);
               }
           };
@@ -3240,14 +3912,14 @@ var Vue = (function (exports) {
                   instance.isDeactivated = true;
               }, parentSuspense);
               {
-                  // Update src2 tree
+                  // Update components tree
                   devtoolsComponentAdded(instance);
               }
           };
           function unmount(vnode) {
               // reset the shapeFlag so it can be properly unmounted
               resetShapeFlag(vnode);
-              _unmount(vnode, instance, parentSuspense);
+              _unmount(vnode, instance, parentSuspense, true);
           }
           function pruneCache(filter) {
               cache.forEach((vnode, key) => {
@@ -3324,7 +3996,7 @@ var Vue = (function (exports) {
               }
               let vnode = getInnerChild(rawVNode);
               const comp = vnode.type;
-              // for async src2, name check should be based in its loaded
+              // for async components, name check should be based in its loaded
               // inner component if available
               const name = getComponentName(isAsyncWrapper(vnode)
                   ? vnode.type.__asyncResolved || {}
@@ -3420,7 +4092,7 @@ var Vue = (function (exports) {
       // In addition to registering it on the target instance, we walk up the parent
       // chain and register it on all ancestor instances that are keep-alive roots.
       // This avoids the need to walk the entire component tree when invoking these
-      // hooks, and more importantly, avoids the need to track child src2 in
+      // hooks, and more importantly, avoids the need to track child components in
       // arrays.
       if (target) {
           let current = target.parent;
@@ -4725,7 +5397,7 @@ var Vue = (function (exports) {
           return;
       }
       if (isAsyncWrapper(vnode) && !isUnmount) {
-          // when mounting async src2, nothing needs to be done,
+          // when mounting async components, nothing needs to be done,
           // because the template ref is forwarded to inner component
           return;
       }
@@ -5285,7 +5957,7 @@ var Vue = (function (exports) {
           }
       };
       const mountStaticNode = (n2, container, anchor, isSVG) => {
-          [n2.el, n2.anchor] = hostInsertStaticContent(n2.children, container, anchor, isSVG);
+          [n2.el, n2.anchor] = hostInsertStaticContent(n2.children, container, anchor, isSVG, n2.el, n2.anchor);
       };
       /**
        * Dev / HMR only
@@ -6540,7 +7212,7 @@ var Vue = (function (exports) {
               dynamicChildren = null;
           }
           if (n1 == null) {
-              // insert anchors in the main views
+              // insert anchors in the main view
               const placeholder = (n2.el = createComment('teleport start')
                   );
               const mainAnchor = (n2.anchor = createComment('teleport end')
@@ -6644,7 +7316,7 @@ var Vue = (function (exports) {
       }
       const { el, anchor, shapeFlag, children, props } = vnode;
       const isReorder = moveType === 2 /* REORDER */;
-      // move main views anchor if this is a re-order.
+      // move main view anchor if this is a re-order.
       if (isReorder) {
           insert(el, container, parentAnchor);
       }
@@ -6659,7 +7331,7 @@ var Vue = (function (exports) {
               }
           }
       }
-      // move main views anchor if this is a re-order.
+      // move main view anchor if this is a re-order.
       if (isReorder) {
           insert(anchor, container, parentAnchor);
       }
@@ -7364,7 +8036,7 @@ var Vue = (function (exports) {
   }
 
   /**
-   * #2437 In Vue 3, functional src2 do not have a public instance proxy but
+   * #2437 In Vue 3, functional components do not have a public instance proxy but
    * they exist in the internal parent chain. For code that relies on traversing
    * public $parent chains, skip functional ones and go to the parent instead.
    */
@@ -7856,7 +8528,7 @@ var Vue = (function (exports) {
       // template / render function normalization
       // could be already set when returned from setup()
       if (!instance.render) {
-          // only do on-the-fly compile if not in SSR - SSR on-the-fly compliation
+          // only do on-the-fly compile if not in SSR - SSR on-the-fly compilation
           // is done by server-renderer
           if (!isSSR && compile && !Component.render) {
               const template = Component.template;
@@ -8000,676 +8672,10 @@ var Vue = (function (exports) {
       return isFunction(value) && '__vccOpts' in value;
   }
 
-  const stack = [];
-  function pushWarningContext(vnode) {
-      stack.push(vnode);
-  }
-  function popWarningContext() {
-      stack.pop();
-  }
-  function warn$1(msg, ...args) {
-      // avoid props formatting or warn handler tracking deps that might be mutated
-      // during patch, leading to infinite recursion.
-      pauseTracking();
-      const instance = stack.length ? stack[stack.length - 1].component : null;
-      const appWarnHandler = instance && instance.appContext.config.warnHandler;
-      const trace = getComponentTrace();
-      if (appWarnHandler) {
-          callWithErrorHandling(appWarnHandler, instance, 11 /* APP_WARN_HANDLER */, [
-              msg + args.join(''),
-              instance && instance.proxy,
-              trace
-                  .map(({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`)
-                  .join('\n'),
-              trace
-          ]);
-      }
-      else {
-          const warnArgs = [`[Vue warn]: ${msg}`, ...args];
-          /* istanbul ignore if */
-          if (trace.length &&
-              // avoid spamming console during tests
-              !false) {
-              warnArgs.push(`\n`, ...formatTrace(trace));
-          }
-          console.warn(...warnArgs);
-      }
-      resetTracking();
-  }
-  function getComponentTrace() {
-      let currentVNode = stack[stack.length - 1];
-      if (!currentVNode) {
-          return [];
-      }
-      // we can't just use the stack because it will be incomplete during updates
-      // that did not start from the root. Re-construct the parent chain using
-      // instance parent pointers.
-      const normalizedStack = [];
-      while (currentVNode) {
-          const last = normalizedStack[0];
-          if (last && last.vnode === currentVNode) {
-              last.recurseCount++;
-          }
-          else {
-              normalizedStack.push({
-                  vnode: currentVNode,
-                  recurseCount: 0
-              });
-          }
-          const parentInstance = currentVNode.component && currentVNode.component.parent;
-          currentVNode = parentInstance && parentInstance.vnode;
-      }
-      return normalizedStack;
-  }
-  /* istanbul ignore next */
-  function formatTrace(trace) {
-      const logs = [];
-      trace.forEach((entry, i) => {
-          logs.push(...(i === 0 ? [] : [`\n`]), ...formatTraceEntry(entry));
-      });
-      return logs;
-  }
-  function formatTraceEntry({ vnode, recurseCount }) {
-      const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
-      const isRoot = vnode.component ? vnode.component.parent == null : false;
-      const open = ` at <${formatComponentName(vnode.component, vnode.type, isRoot)}`;
-      const close = `>` + postfix;
-      return vnode.props
-          ? [open, ...formatProps(vnode.props), close]
-          : [open + close];
-  }
-  /* istanbul ignore next */
-  function formatProps(props) {
-      const res = [];
-      const keys = Object.keys(props);
-      keys.slice(0, 3).forEach(key => {
-          res.push(...formatProp(key, props[key]));
-      });
-      if (keys.length > 3) {
-          res.push(` ...`);
-      }
-      return res;
-  }
-  /* istanbul ignore next */
-  function formatProp(key, value, raw) {
-      if (isString(value)) {
-          value = JSON.stringify(value);
-          return raw ? value : [`${key}=${value}`];
-      }
-      else if (typeof value === 'number' ||
-          typeof value === 'boolean' ||
-          value == null) {
-          return raw ? value : [`${key}=${value}`];
-      }
-      else if (isRef(value)) {
-          value = formatProp(key, toRaw(value.value), true);
-          return raw ? value : [`${key}=Ref<`, value, `>`];
-      }
-      else if (isFunction(value)) {
-          return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
-      }
-      else {
-          value = toRaw(value);
-          return raw ? value : [`${key}=`, value];
-      }
-  }
-
-  const ErrorTypeStrings = {
-      ["sp" /* SERVER_PREFETCH */]: 'serverPrefetch hook',
-      ["bc" /* BEFORE_CREATE */]: 'beforeCreate hook',
-      ["c" /* CREATED */]: 'created hook',
-      ["bm" /* BEFORE_MOUNT */]: 'beforeMount hook',
-      ["m" /* MOUNTED */]: 'mounted hook',
-      ["bu" /* BEFORE_UPDATE */]: 'beforeUpdate hook',
-      ["u" /* UPDATED */]: 'updated',
-      ["bum" /* BEFORE_UNMOUNT */]: 'beforeUnmount hook',
-      ["um" /* UNMOUNTED */]: 'unmounted hook',
-      ["a" /* ACTIVATED */]: 'activated hook',
-      ["da" /* DEACTIVATED */]: 'deactivated hook',
-      ["ec" /* ERROR_CAPTURED */]: 'errorCaptured hook',
-      ["rtc" /* RENDER_TRACKED */]: 'renderTracked hook',
-      ["rtg" /* RENDER_TRIGGERED */]: 'renderTriggered hook',
-      [0 /* SETUP_FUNCTION */]: 'setup function',
-      [1 /* RENDER_FUNCTION */]: 'render function',
-      [2 /* WATCH_GETTER */]: 'watcher getter',
-      [3 /* WATCH_CALLBACK */]: 'watcher callback',
-      [4 /* WATCH_CLEANUP */]: 'watcher cleanup function',
-      [5 /* NATIVE_EVENT_HANDLER */]: 'native event handler',
-      [6 /* COMPONENT_EVENT_HANDLER */]: 'component event handler',
-      [7 /* VNODE_HOOK */]: 'vnode hook',
-      [8 /* DIRECTIVE_HOOK */]: 'directive hook',
-      [9 /* TRANSITION_HOOK */]: 'transition hook',
-      [10 /* APP_ERROR_HANDLER */]: 'app errorHandler',
-      [11 /* APP_WARN_HANDLER */]: 'app warnHandler',
-      [12 /* FUNCTION_REF */]: 'ref function',
-      [13 /* ASYNC_COMPONENT_LOADER */]: 'async component loader',
-      [14 /* SCHEDULER */]: 'scheduler flush. This is likely a Vue internals bug. ' +
-          'Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/vue-next'
-  };
-  function callWithErrorHandling(fn, instance, type, args) {
-      let res;
-      try {
-          res = args ? fn(...args) : fn();
-      }
-      catch (err) {
-          handleError(err, instance, type);
-      }
-      return res;
-  }
-  function callWithAsyncErrorHandling(fn, instance, type, args) {
-      if (isFunction(fn)) {
-          const res = callWithErrorHandling(fn, instance, type, args);
-          if (res && isPromise(res)) {
-              res.catch(err => {
-                  handleError(err, instance, type);
-              });
-          }
-          return res;
-      }
-      const values = [];
-      for (let i = 0; i < fn.length; i++) {
-          values.push(callWithAsyncErrorHandling(fn[i], instance, type, args));
-      }
-      return values;
-  }
-  function handleError(err, instance, type, throwInDev = true) {
-      const contextVNode = instance ? instance.vnode : null;
-      if (instance) {
-          let cur = instance.parent;
-          // the exposed instance is the render proxy to keep it consistent with 2.x
-          const exposedInstance = instance.proxy;
-          // in production the hook receives only the error code
-          const errorInfo = ErrorTypeStrings[type] ;
-          while (cur) {
-              const errorCapturedHooks = cur.ec;
-              if (errorCapturedHooks) {
-                  for (let i = 0; i < errorCapturedHooks.length; i++) {
-                      if (errorCapturedHooks[i](err, exposedInstance, errorInfo) === false) {
-                          return;
-                      }
-                  }
-              }
-              cur = cur.parent;
-          }
-          // app-level handling
-          const appErrorHandler = instance.appContext.config.errorHandler;
-          if (appErrorHandler) {
-              callWithErrorHandling(appErrorHandler, null, 10 /* APP_ERROR_HANDLER */, [err, exposedInstance, errorInfo]);
-              return;
-          }
-      }
-      logError(err, type, contextVNode, throwInDev);
-  }
-  function logError(err, type, contextVNode, throwInDev = true) {
-      {
-          const info = ErrorTypeStrings[type];
-          if (contextVNode) {
-              pushWarningContext(contextVNode);
-          }
-          warn$1(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
-          if (contextVNode) {
-              popWarningContext();
-          }
-          // crash in dev by default so it's more noticeable
-          if (throwInDev) {
-              throw err;
-          }
-          else {
-              console.error(err);
-          }
-      }
-  }
-
-  let isFlushing = false;
-  let isFlushPending = false;
-  const queue = [];
-  let flushIndex = 0;
-  const pendingPreFlushCbs = [];
-  let activePreFlushCbs = null;
-  let preFlushIndex = 0;
-  const pendingPostFlushCbs = [];
-  let activePostFlushCbs = null;
-  let postFlushIndex = 0;
-  const resolvedPromise = Promise.resolve();
-  let currentFlushPromise = null;
-  let currentPreFlushParentJob = null;
-  const RECURSION_LIMIT = 100;
-  function nextTick(fn) {
-      const p = currentFlushPromise || resolvedPromise;
-      return fn ? p.then(this ? fn.bind(this) : fn) : p;
-  }
-  // #2768
-  // Use binary-search to find a suitable position in the queue,
-  // so that the queue maintains the increasing order of job's id,
-  // which can prevent the job from being skipped and also can avoid repeated patching.
-  function findInsertionIndex(id) {
-      // the start index should be `flushIndex + 1`
-      let start = flushIndex + 1;
-      let end = queue.length;
-      while (start < end) {
-          const middle = (start + end) >>> 1;
-          const middleJobId = getId(queue[middle]);
-          middleJobId < id ? (start = middle + 1) : (end = middle);
-      }
-      return start;
-  }
-  function queueJob(job) {
-      // the dedupe search uses the startIndex argument of Array.includes()
-      // by default the search index includes the current job that is being run
-      // so it cannot recursively trigger itself again.
-      // if the job is a watch() callback, the search will start with a +1 index to
-      // allow it recursively trigger itself - it is the user's responsibility to
-      // ensure it doesn't end up in an infinite loop.
-      if ((!queue.length ||
-          !queue.includes(job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex)) &&
-          job !== currentPreFlushParentJob) {
-          if (job.id == null) {
-              queue.push(job);
-          }
-          else {
-              queue.splice(findInsertionIndex(job.id), 0, job);
-          }
-          queueFlush();
-      }
-  }
-  function queueFlush() {
-      if (!isFlushing && !isFlushPending) {
-          isFlushPending = true;
-          currentFlushPromise = resolvedPromise.then(flushJobs);
-      }
-  }
-  function invalidateJob(job) {
-      const i = queue.indexOf(job);
-      if (i > flushIndex) {
-          queue.splice(i, 1);
-      }
-  }
-  function queueCb(cb, activeQueue, pendingQueue, index) {
-      if (!isArray(cb)) {
-          if (!activeQueue ||
-              !activeQueue.includes(cb, cb.allowRecurse ? index + 1 : index)) {
-              pendingQueue.push(cb);
-          }
-      }
-      else {
-          // if cb is an array, it is a component lifecycle hook which can only be
-          // triggered by a job, which is already deduped in the main queue, so
-          // we can skip duplicate check here to improve perf
-          pendingQueue.push(...cb);
-      }
-      queueFlush();
-  }
-  function queuePreFlushCb(cb) {
-      queueCb(cb, activePreFlushCbs, pendingPreFlushCbs, preFlushIndex);
-  }
-  function queuePostFlushCb(cb) {
-      queueCb(cb, activePostFlushCbs, pendingPostFlushCbs, postFlushIndex);
-  }
-  function flushPreFlushCbs(seen, parentJob = null) {
-      if (pendingPreFlushCbs.length) {
-          currentPreFlushParentJob = parentJob;
-          activePreFlushCbs = [...new Set(pendingPreFlushCbs)];
-          pendingPreFlushCbs.length = 0;
-          {
-              seen = seen || new Map();
-          }
-          for (preFlushIndex = 0; preFlushIndex < activePreFlushCbs.length; preFlushIndex++) {
-              if (checkRecursiveUpdates(seen, activePreFlushCbs[preFlushIndex])) {
-                  continue;
-              }
-              activePreFlushCbs[preFlushIndex]();
-          }
-          activePreFlushCbs = null;
-          preFlushIndex = 0;
-          currentPreFlushParentJob = null;
-          // recursively flush until it drains
-          flushPreFlushCbs(seen, parentJob);
-      }
-  }
-  function flushPostFlushCbs(seen) {
-      if (pendingPostFlushCbs.length) {
-          const deduped = [...new Set(pendingPostFlushCbs)];
-          pendingPostFlushCbs.length = 0;
-          // #1947 already has active queue, nested flushPostFlushCbs call
-          if (activePostFlushCbs) {
-              activePostFlushCbs.push(...deduped);
-              return;
-          }
-          activePostFlushCbs = deduped;
-          {
-              seen = seen || new Map();
-          }
-          activePostFlushCbs.sort((a, b) => getId(a) - getId(b));
-          for (postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++) {
-              if (checkRecursiveUpdates(seen, activePostFlushCbs[postFlushIndex])) {
-                  continue;
-              }
-              activePostFlushCbs[postFlushIndex]();
-          }
-          activePostFlushCbs = null;
-          postFlushIndex = 0;
-      }
-  }
-  const getId = (job) => job.id == null ? Infinity : job.id;
-  function flushJobs(seen) {
-      isFlushPending = false;
-      isFlushing = true;
-      {
-          seen = seen || new Map();
-      }
-      flushPreFlushCbs(seen);
-      // Sort queue before flush.
-      // This ensures that:
-      // 1. Components are updated from parent to child. (because parent is always
-      //    created before the child so its render effect will have smaller
-      //    priority number)
-      // 2. If a component is unmounted during a parent component's update,
-      //    its update can be skipped.
-      queue.sort((a, b) => getId(a) - getId(b));
-      // conditional usage of checkRecursiveUpdate must be determined out of
-      // try ... catch block since Rollup by default de-optimizes treeshaking
-      // inside try-catch. This can leave all warning code unshaked. Although
-      // they would get eventually shaken by a minifier like terser, some minifiers
-      // would fail to do that (e.g. https://github.com/evanw/esbuild/issues/1610)
-      const check = (job) => checkRecursiveUpdates(seen, job)
-          ;
-      try {
-          for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
-              const job = queue[flushIndex];
-              if (job && job.active !== false) {
-                  if (true && check(job)) {
-                      continue;
-                  }
-                  // console.log(`running:`, job.id)
-                  callWithErrorHandling(job, null, 14 /* SCHEDULER */);
-              }
-          }
-      }
-      finally {
-          flushIndex = 0;
-          queue.length = 0;
-          flushPostFlushCbs(seen);
-          isFlushing = false;
-          currentFlushPromise = null;
-          // some postFlushCb queued jobs!
-          // keep flushing until it drains.
-          if (queue.length ||
-              pendingPreFlushCbs.length ||
-              pendingPostFlushCbs.length) {
-              flushJobs(seen);
-          }
-      }
-  }
-  function checkRecursiveUpdates(seen, fn) {
-      if (!seen.has(fn)) {
-          seen.set(fn, 1);
-      }
-      else {
-          const count = seen.get(fn);
-          if (count > RECURSION_LIMIT) {
-              const instance = fn.ownerInstance;
-              const componentName = instance && getComponentName(instance.type);
-              warn$1(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. ` +
-                  `This means you have a reactive effect that is mutating its own ` +
-                  `dependencies and thus recursively triggering itself. Possible sources ` +
-                  `include component template, render function, updated hook or ` +
-                  `watcher source function.`);
-              return true;
-          }
-          else {
-              seen.set(fn, count + 1);
-          }
-      }
-  }
-
-  // Simple effect.
-  function watchEffect(effect, options) {
-      return doWatch(effect, null, options);
-  }
-  function watchPostEffect(effect, options) {
-      return doWatch(effect, null, (Object.assign(options || {}, { flush: 'post' })
-          ));
-  }
-  function watchSyncEffect(effect, options) {
-      return doWatch(effect, null, (Object.assign(options || {}, { flush: 'sync' })
-          ));
-  }
-  // initial value for watchers to trigger on undefined initial values
-  const INITIAL_WATCHER_VALUE = {};
-  // implementation
-  function watch(source, cb, options) {
-      if (!isFunction(cb)) {
-          warn$1(`\`watch(fn, options?)\` signature has been moved to a separate API. ` +
-              `Use \`watchEffect(fn, options?)\` instead. \`watch\` now only ` +
-              `supports \`watch(source, cb, options?) signature.`);
-      }
-      return doWatch(source, cb, options);
-  }
-  function doWatch(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ) {
-      if (!cb) {
-          if (immediate !== undefined) {
-              warn$1(`watch() "immediate" option is only respected when using the ` +
-                  `watch(source, callback, options?) signature.`);
-          }
-          if (deep !== undefined) {
-              warn$1(`watch() "deep" option is only respected when using the ` +
-                  `watch(source, callback, options?) signature.`);
-          }
-      }
-      const warnInvalidSource = (s) => {
-          warn$1(`Invalid watch source: `, s, `A watch source can only be a getter/effect function, a ref, ` +
-              `a reactive object, or an array of these types.`);
-      };
-      const instance = currentInstance;
-      let getter;
-      let forceTrigger = false;
-      let isMultiSource = false;
-      if (isRef(source)) {
-          getter = () => source.value;
-          forceTrigger = !!source._shallow;
-      }
-      else if (isReactive(source)) {
-          getter = () => source;
-          deep = true;
-      }
-      else if (isArray(source)) {
-          isMultiSource = true;
-          forceTrigger = source.some(isReactive);
-          getter = () => source.map(s => {
-              if (isRef(s)) {
-                  return s.value;
-              }
-              else if (isReactive(s)) {
-                  return traverse(s);
-              }
-              else if (isFunction(s)) {
-                  return callWithErrorHandling(s, instance, 2 /* WATCH_GETTER */);
-              }
-              else {
-                  warnInvalidSource(s);
-              }
-          });
-      }
-      else if (isFunction(source)) {
-          if (cb) {
-              // getter with cb
-              getter = () => callWithErrorHandling(source, instance, 2 /* WATCH_GETTER */);
-          }
-          else {
-              // no cb -> simple effect
-              getter = () => {
-                  if (instance && instance.isUnmounted) {
-                      return;
-                  }
-                  if (cleanup) {
-                      cleanup();
-                  }
-                  return callWithAsyncErrorHandling(source, instance, 3 /* WATCH_CALLBACK */, [onInvalidate]);
-              };
-          }
-      }
-      else {
-          getter = NOOP;
-          warnInvalidSource(source);
-      }
-      if (cb && deep) {
-          const baseGetter = getter;
-          getter = () => traverse(baseGetter());
-      }
-      let cleanup;
-      let onInvalidate = (fn) => {
-          cleanup = effect.onStop = () => {
-              callWithErrorHandling(fn, instance, 4 /* WATCH_CLEANUP */);
-          };
-      };
-      let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE;
-      const job = () => {
-          if (!effect.active) {
-              return;
-          }
-          if (cb) {
-              // watch(source, cb)
-              const newValue = effect.run();
-              if (deep ||
-                  forceTrigger ||
-                  (isMultiSource
-                      ? newValue.some((v, i) => hasChanged(v, oldValue[i]))
-                      : hasChanged(newValue, oldValue)) ||
-                  (false  )) {
-                  // cleanup before running cb again
-                  if (cleanup) {
-                      cleanup();
-                  }
-                  callWithAsyncErrorHandling(cb, instance, 3 /* WATCH_CALLBACK */, [
-                      newValue,
-                      // pass undefined as the old value when it's changed for the first time
-                      oldValue === INITIAL_WATCHER_VALUE ? undefined : oldValue,
-                      onInvalidate
-                  ]);
-                  oldValue = newValue;
-              }
-          }
-          else {
-              // watchEffect
-              effect.run();
-          }
-      };
-      // important: mark the job as a watcher callback so that scheduler knows
-      // it is allowed to self-trigger (#1727)
-      job.allowRecurse = !!cb;
-      let scheduler;
-      if (flush === 'sync') {
-          scheduler = job; // the scheduler function gets called directly
-      }
-      else if (flush === 'post') {
-          scheduler = () => queuePostRenderEffect(job, instance && instance.suspense);
-      }
-      else {
-          // default: 'pre'
-          scheduler = () => {
-              if (!instance || instance.isMounted) {
-                  queuePreFlushCb(job);
-              }
-              else {
-                  // with 'pre' option, the first call must happen before
-                  // the component is mounted so it is called synchronously.
-                  job();
-              }
-          };
-      }
-      const effect = new ReactiveEffect(getter, scheduler);
-      {
-          effect.onTrack = onTrack;
-          effect.onTrigger = onTrigger;
-      }
-      // initial run
-      if (cb) {
-          if (immediate) {
-              job();
-          }
-          else {
-              oldValue = effect.run();
-          }
-      }
-      else if (flush === 'post') {
-          queuePostRenderEffect(effect.run.bind(effect), instance && instance.suspense);
-      }
-      else {
-          effect.run();
-      }
-      return () => {
-          effect.stop();
-          if (instance && instance.scope) {
-              remove(instance.scope.effects, effect);
-          }
-      };
-  }
-  // this.$watch
-  function instanceWatch(source, value, options) {
-      const publicThis = this.proxy;
-      const getter = isString(source)
-          ? source.includes('.')
-              ? createPathGetter(publicThis, source)
-              : () => publicThis[source]
-          : source.bind(publicThis, publicThis);
-      let cb;
-      if (isFunction(value)) {
-          cb = value;
-      }
-      else {
-          cb = value.handler;
-          options = value;
-      }
-      const cur = currentInstance;
-      setCurrentInstance(this);
-      const res = doWatch(getter, cb.bind(publicThis), options);
-      if (cur) {
-          setCurrentInstance(cur);
-      }
-      else {
-          unsetCurrentInstance();
-      }
-      return res;
-  }
-  function createPathGetter(ctx, path) {
-      const segments = path.split('.');
-      return () => {
-          let cur = ctx;
-          for (let i = 0; i < segments.length && cur; i++) {
-              cur = cur[segments[i]];
-          }
-          return cur;
-      };
-  }
-  function traverse(value, seen) {
-      if (!isObject(value) || value["__v_skip" /* SKIP */]) {
-          return value;
-      }
-      seen = seen || new Set();
-      if (seen.has(value)) {
-          return value;
-      }
-      seen.add(value);
-      if (isRef(value)) {
-          traverse(value.value, seen);
-      }
-      else if (isArray(value)) {
-          for (let i = 0; i < value.length; i++) {
-              traverse(value[i], seen);
-          }
-      }
-      else if (isSet(value) || isMap(value)) {
-          value.forEach((v) => {
-              traverse(v, seen);
-          });
-      }
-      else if (isPlainObject(value)) {
-          for (const key in value) {
-              traverse(value[key], seen);
-          }
-      }
-      return value;
-  }
+  const computed$1 = ((getterOrOptions, debugOptions) => {
+      // @ts-ignore
+      return computed(getterOrOptions, debugOptions, isInSSRComponentSetup);
+  });
 
   // dev only
   const warnRuntimeUsage = (method) => warn$1(`${method}() is a compiler-hint helper that is only usable inside ` +
@@ -8694,7 +8700,7 @@ var Vue = (function (exports) {
    * instance properties when it is accessed by a parent component via template
    * refs.
    *
-   * `<script setup>` src2 are closed by default - i.e. varaibles inside
+   * `<script setup>` components are closed by default - i.e. varaibles inside
    * the `<script setup>` scope is not exposed to parent unless explicitly exposed
    * via `defineExpose`.
    *
@@ -9075,7 +9081,7 @@ var Vue = (function (exports) {
   }
 
   // Core API ------------------------------------------------------------------
-  const version = "3.2.26";
+  const version = "3.2.27";
   /**
    * SSR utils for \@vue/server-renderer. Only exposed in cjs builds.
    * @internal
@@ -9092,7 +9098,7 @@ var Vue = (function (exports) {
 
   const svgNS = 'http://www.w3.org/2000/svg';
   const doc = (typeof document !== 'undefined' ? document : null);
-  const staticTemplateCache = new Map();
+  const templateContainer = doc && doc.createElement('template');
   const nodeOps = {
       insert: (child, parent, anchor) => {
           parent.insertBefore(child, anchor || null);
@@ -9146,14 +9152,21 @@ var Vue = (function (exports) {
       // Reason: innerHTML.
       // Static content here can only come from compiled templates.
       // As long as the user only uses trusted templates, this is safe.
-      insertStaticContent(content, parent, anchor, isSVG) {
+      insertStaticContent(content, parent, anchor, isSVG, start, end) {
           // <parent> before | first ... last | anchor </parent>
           const before = anchor ? anchor.previousSibling : parent.lastChild;
-          let template = staticTemplateCache.get(content);
-          if (!template) {
-              const t = doc.createElement('template');
-              t.innerHTML = isSVG ? `<svg>${content}</svg>` : content;
-              template = t.content;
+          if (start && end) {
+              // cached
+              while (true) {
+                  parent.insertBefore(start.cloneNode(true), anchor);
+                  if (start === end || !(start = start.nextSibling))
+                      break;
+              }
+          }
+          else {
+              // fresh insert
+              templateContainer.innerHTML = isSVG ? `<svg>${content}</svg>` : content;
+              const template = templateContainer.content;
               if (isSVG) {
                   // remove outer svg wrapper
                   const wrapper = template.firstChild;
@@ -9162,9 +9175,8 @@ var Vue = (function (exports) {
                   }
                   template.removeChild(wrapper);
               }
-              staticTemplateCache.set(content, template);
+              parent.insertBefore(template, anchor);
           }
-          parent.insertBefore(template.cloneNode(true), anchor);
           return [
               // first
               before ? before.nextSibling : parent.firstChild,
@@ -14191,7 +14203,7 @@ var Vue = (function (exports) {
               // <button is="vue:xxx">
               // if not <component>, only is value that starts with "vue:" will be
               // treated as component by the parse phase and reach here, unless it's
-              // compat mode where all is values are considered src2
+              // compat mode where all is values are considered components
               tag = isProp.value.content.slice(4);
           }
       }
@@ -14202,7 +14214,7 @@ var Vue = (function (exports) {
               isDir.exp
           ]);
       }
-      // 2. built-in src2 (Teleport, Transition, KeepAlive, Suspense...)
+      // 2. built-in components (Teleport, Transition, KeepAlive, Suspense...)
       const builtIn = isCoreComponent(tag) || context.isBuiltInComponent(tag);
       if (builtIn) {
           // built-ins are simply fallthroughs / have special handling during ssr
@@ -14726,7 +14738,7 @@ var Vue = (function (exports) {
       if (shouldCache) {
           // cache handlers so that it's always the same handler being passed down.
           // this avoids unnecessary re-renders when users use inline handlers on
-          // src2.
+          // components.
           ret.props[0].value = context.cache(ret.props[0].value);
       }
       // mark the key as handler for props normalization check
@@ -15573,7 +15585,7 @@ var Vue = (function (exports) {
   exports.cloneVNode = cloneVNode;
   exports.compatUtils = compatUtils;
   exports.compile = compileToFunction;
-  exports.computed = computed;
+  exports.computed = computed$1;
   exports.createApp = createApp;
   exports.createBlock = createBlock;
   exports.createCommentVNode = createCommentVNode;

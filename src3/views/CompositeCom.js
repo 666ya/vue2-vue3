@@ -14,7 +14,8 @@ export default {
       default: ''
     }
   },
-  setup(props) {
+  setup(props, context) {
+    console.log(context)
     const {
       user
     } = toRefs(props)

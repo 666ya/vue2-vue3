@@ -58,11 +58,22 @@ const TransitionCom = {
         </div>
     `
 }
+// 
+const TeleportCom = {
+    name: 'TeleportCom',
+    template: `<div style="position: relative">
+                <teleport to='body' disabled>
+                    <div class="modal">loading……</div>
+                </teleport>
+                <!--<div class="modal">loading……</div>-->
+            </div>`
+}
 // 内置组件
 export default {
     name: 'BuiltInCom',
     components: {
-        TransitionCom
+        TransitionCom,
+        TeleportCom
     },
-    template: `<transition-com></transition-com>`
+    template: `<teleport-com></teleport-com>`
 }

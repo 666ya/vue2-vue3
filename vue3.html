@@ -46,6 +46,15 @@
       border: 1px solid #333;
       margin: 10px 0;
     }
+
+    .modal {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.5);
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
   </style>
   <style>
     /* transiton动画 */
@@ -115,8 +124,9 @@
   import InstanceMethodsCom from './src3/views/InstanceMethodsCom.js'
   import AppDirectivesCom from './src3/views/AppDirectivesCom.js'
   import BuiltInCom from './src3/views/BuiltInCom.js'
+  import CompositionApiCom from './src3/views/CompositionApiCom.js'
+  import BaseReactivityCom from './src3/views/BaseReactivityCom.js'
 
-  import CompositeCom from "./src3/views/CompositeCom.js";
 
   import DiffComponent from './diffcomponent/DiffComponent.js'
   import SlotCom from "./src3/views/SlotCom.js";
@@ -125,12 +135,12 @@
     inject: ['userLogin'],
     components: {
       SlotCom,
-      CompositeCom,
       AppConfigCom,
       AppApiCom,
       AppOptionsCom,
       InstanceMethodsCom,
-      AppDirectivesCom
+      AppDirectivesCom,
+      CompositionApiCom
     },
     data() {
       return {
@@ -140,7 +150,7 @@
         user: '张三',
         ok: false,
         title: 'Vue3',
-        curComponent: 'BuiltInCom',
+        curComponent: 'BaseReactivityCom',
         apiList: [
           // {
           //   title: '插槽',
@@ -182,11 +192,21 @@
           //   name: 'AppDirectivesCom',
           //   component: AppDirectivesCom
           // },
-           {
-           title: '内置组件',
-           name: 'BuiltInCom',
-           component: BuiltInCom
-           },
+          //  {
+          //  title: '内置组件',
+          //  name: 'BuiltInCom',
+          //  component: BuiltInCom
+          //  },
+          //   {
+          //   title: '组合式API',
+          //   name: 'CompositionApiCom',
+          //   component: CompositionApiCom
+          //   },
+            {
+             title: '响应性基础',
+             name: 'BaseReactivityCom',
+             component: BaseReactivityCom
+            }
           //  {
           //     title: '非兼容变更',
           //     name: 'Diff',
