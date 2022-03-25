@@ -2,19 +2,46 @@ const {
     reactive,
     readonly,
     ref,
+    isRef,
     isProxy,
     isReactive,
     isReadonly,
-    makeRaw
+    markRaw,
+    shallowReactive,
+    toRaw,
+    onMounted,
+    watchEffect
 } = Vue
+// 
+const ShallowCom = {
+    name: 'ShallowCom',
+    setup() {
+        const state = shallowReactive({
+            foo: 1,
+            nested: {
+                bar: 2
+            }
+        })
+        watchEffect(() => {
+            console.log(state.nested.bar)
+        })
+        setTimeout(() => {
+            state.foo++
+            state.nested.bar++
+        }, 2000)
+        return {
+            state
+        }
+    },
+    template: `<div><p>shallowReactive：{{ state.foo }} {{ state.nested.bar }}</p></div>`
+}
 // makeRaw, shallowReactive,shavllowReadonly
 const MakeRawCom = {
     name: 'MakeRawCom',
     setup(props) {
-        const raw = makeRaw({})
-        console.log(raw)
+
     },
-    template: `<div>makeRaw</div>`
+    template: `<div>{{ s }}</div>`
 }
 // readonly
 const ReadonlyCom = {
@@ -54,7 +81,8 @@ export default {
     name: 'BaseReactivityCom',
     components: {
         ReadonlyCom,
-        MakeRawCom
+        MakeRawCom,
+        ShallowCom
     },
-    template: `<make-raw-com></make-raw-com>`
+    template: `<shallow-com></shallow-com>`
 }
