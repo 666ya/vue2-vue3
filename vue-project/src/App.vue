@@ -1,4 +1,11 @@
 <template>
+  <input
+    type="checkbox"
+    v-model="toggleValue"
+    true-value="options"
+    false-value="composition"
+  />
+  <label>{{ toggleValue }}</label>
   <!-- <TemplateSyntax /> -->
   <!-- <ReactivityFundaments /> -->
   <!-- <ComputedProperties /> -->
@@ -8,7 +15,7 @@
   <!-- <TemplateRefs /> -->
   <!-- <ComponentBasics /> -->
   <!-- <Props /> -->
-  <EventsComponent />
+  <FallthroughAttribute />
 </template>
 <script>
 import TemplateSyntax from "./components/TemplateSyntax.vue";
@@ -21,9 +28,12 @@ import TemplateRefs from "./components/TemplateRefs.vue";
 import ComponentBasics from "./components/ComponentBasics.vue";
 import Props from "./components/Props.vue";
 import EventsComponent from "./components/EventsComponent.vue";
+import FallthroughAttribute from "./components/fallthroughAttributes/Index.vue";
 export default {
   data() {
-    return {};
+    return {
+      toggleValue: sessionStorage.getItem("api") || "options",
+    };
   },
   components: {
     TemplateSyntax,
@@ -36,6 +46,12 @@ export default {
     ComponentBasics,
     Props,
     EventsComponent,
+    FallthroughAttribute,
+  },
+  watch: {
+    toggleValue: function (value) {
+      sessionStorage.setItem("api", value);
+    },
   },
 };
 </script>

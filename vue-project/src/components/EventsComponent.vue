@@ -8,10 +8,10 @@
 
 <script>
 const BaseButton = {
-  props: {
-    class: "",
+  template: `<button class="foo">点击</button><span v-bind="$attrs">aa</span>`,
+  created() {
+    console.log(this.$attrs);
   },
-  template: `<button class="foo">点击</button>`,
   methods: {
     clickFn() {
       console.log("child");
