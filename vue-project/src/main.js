@@ -4,7 +4,9 @@ import {
 } from 'vue'
 import App from './App.vue'
 import il8nPlugin from './plugins/il8n.js'
-const app = createApp(App)
+const app = createApp(App, {
+    user: '李白'
+})
 //应用Api
 app.config.warnHandler = (warn, instance, trace) => {
     console.log(warn)

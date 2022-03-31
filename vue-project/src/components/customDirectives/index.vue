@@ -23,6 +23,7 @@ const focus = {
   },
 };
 export default {
+  props: ['users'],
   directives: {
     focus,
   },
@@ -34,6 +35,7 @@ export default {
     console.log("beforeCreate");
   },
   created() {
+    console.log(this.users)
     console.log(this.il8n);
     console.log(this.il8n.greetings.hello);
     console.log("created");
