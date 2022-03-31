@@ -15,7 +15,9 @@
   <!-- <TemplateRefs /> -->
   <!-- <ComponentBasics /> -->
   <!-- <Props /> -->
-  <FallthroughAttribute />
+  <!-- <FallthroughAttribute /> -->
+  <!-- <Composables /> -->
+  <CustomDirectives />
 </template>
 <script>
 import TemplateSyntax from "./components/TemplateSyntax.vue";
@@ -29,6 +31,8 @@ import ComponentBasics from "./components/ComponentBasics.vue";
 import Props from "./components/Props.vue";
 import EventsComponent from "./components/EventsComponent.vue";
 import FallthroughAttribute from "./components/fallthroughAttributes/Index.vue";
+import Composables from "./components/composables/Index.vue";
+import CustomDirectives from "./components/customDirectives/index.vue";
 export default {
   data() {
     return {
@@ -47,6 +51,8 @@ export default {
     Props,
     EventsComponent,
     FallthroughAttribute,
+    Composables,
+    CustomDirectives,
   },
   watch: {
     toggleValue: function (value) {
