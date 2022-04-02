@@ -2,10 +2,12 @@
   <div>
     <input v-focus type="text" />
     <p>{{ $translate("greetings.hello") }}</p>
+     <p>自定义选项合并策略：{{$options.customOption }}</p>
   </div>
 </template>
 
-<script>
+<script>import { onScopeDispose } from "vue";
+
 const focus = {
   created(el, binding, vnode, prevNode) {
     console.log("directive-created");
@@ -23,6 +25,12 @@ const focus = {
   },
 };
 export default {
+  customOption: 'localCustomOption',
+  mixins: [
+    {
+      customOption: 'globalCustonOtopins'
+    }
+  ],
   props: ['users'],
   directives: {
     focus,
@@ -30,18 +38,6 @@ export default {
   inject: ["il8n"],
   data() {
     return {};
-  },
-  beforeCreate() {
-    console.log("beforeCreate");
-  },
-  created() {
-    console.log(this.users)
-    console.log(this.il8n);
-    console.log(this.il8n.greetings.hello);
-    console.log("created");
-  },
-  beforeMount() {
-    console.log("beforeMount");
   },
   mounted() {
     console.log("mounted");

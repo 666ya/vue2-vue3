@@ -14,9 +14,13 @@ app.config.warnHandler = (warn, instance, trace) => {
 app.config.errorHandler = (error, instance, trace) => {
     console.log(error)
 }
+app.config.optionMergeStrategies.customOption = (parent,child) => {
+    return parent? parent : child
+}
 app.use(il8nPlugin, {
     greetings: {
         hello: 'Bonjour!'
     }
 })
+app.config.globalProperties.$app = app
 app.mount('#app')

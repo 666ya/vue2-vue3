@@ -58,7 +58,7 @@ export default {
     toggleValue: function (value) {
       sessionStorage.setItem("api", value);
     },
-  },
+  }
 };
 </script>
 
