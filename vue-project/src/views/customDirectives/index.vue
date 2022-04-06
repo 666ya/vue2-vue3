@@ -6,15 +6,11 @@
   </div>
 </template>
 
-<script>import { onScopeDispose } from "vue";
-
+<script>
+import { nextTick } from "vue";
 const focus = {
   created(el, binding, vnode, prevNode) {
     console.log("directive-created");
-    console.log(el);
-    console.log(binding);
-    console.log(vnode);
-    console.log(prevNode);
   },
   beforeMount(el) {
     console.log("beforeMount" + el);
@@ -37,10 +33,12 @@ export default {
   },
   inject: ["il8n"],
   data() {
-    return {};
+    return {
+      value: '11'
+    };
   },
   mounted() {
-    console.log("mounted");
+    nextTick(() => {console.log(this)})
   },
 };
 </script>

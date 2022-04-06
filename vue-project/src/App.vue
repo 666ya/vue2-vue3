@@ -1,12 +1,14 @@
 <template>
-  <input
+<!-- {{ obj.value }} -->
+{{ afterValue }}
+  <!-- <input
     type="checkbox"
     v-model="toggleValue"
     true-value="options"
     false-value="composition"
   />
-  <label>{{ toggleValue }}</label>
-  <!-- <TemplateSyntax /> -->
+  <label>{{ toggleValue }}</label> -->
+   <!-- <TemplateSyntax /> -->
   <!-- <ReactivityFundaments /> -->
   <!-- <ComputedProperties /> -->
   <!-- <ClassStyleBinding /> -->
@@ -17,29 +19,35 @@
   <!-- <Props /> -->
   <!-- <FallthroughAttribute /> -->
   <!-- <Composables /> -->
-  <CustomDirectives />
+   <!-- <CustomDirectives></CustomDirectives> -->
+   <Suspense>
+      <CustomDirectives></CustomDirectives>
+      <!-- 加载中状态 -->
+          <template #fallback>
+            <div class="skeleton"></div>
+          </template>
+   </Suspense>
 </template>
 <script>
-import TemplateSyntax from "./components/TemplateSyntax.vue";
-import ReactivityFundaments from "./components/ReactivityFundaments.vue";
-import ComputedProperties from "./components/ComputedProperties.vue";
-import ClassStyleBinding from "./components/ClassStyleBinding.vue";
-import EventHanding from "./components/EventHanding.vue";
-import Watchers from "./components/Watchers.vue";
-import TemplateRefs from "./components/TemplateRefs.vue";
-import ComponentBasics from "./components/ComponentBasics.vue";
-import Props from "./components/Props.vue";
-import EventsComponent from "./components/EventsComponent.vue";
-import FallthroughAttribute from "./components/fallthroughAttributes/Index.vue";
-import Composables from "./components/composables/Index.vue";
-import CustomDirectives from "./components/customDirectives/index.vue";
+import { defineAsyncComponent } from "vue";
+import LoadingComponent from "./components/LoadingComponent.vue";
+const TemplateSyntax = defineAsyncComponent(() => import('./views/TemplateSyntax.vue'))
+const ReactivityFundaments = defineAsyncComponent(() => import('./views/ReactivityFundaments.vue'))
+const ComputedProperties = defineAsyncComponent(() => import('./views/ComputedProperties.vue'))
+const ClassStyleBinding = defineAsyncComponent(() => import('./views/ClassStyleBinding.vue'))
+const EventHanding = defineAsyncComponent(() => import('./views/EventHanding.vue'))
+const Watchers = defineAsyncComponent(() => import('./views/Watchers.vue'))
+const TemplateRefs = defineAsyncComponent(() => import('./views/TemplateRefs.vue'))
+const ComponentBasics = defineAsyncComponent(() => import('./views/ComponentBasics.vue'))
+const Props = defineAsyncComponent(() => import('./views/Props.vue'))
+const EventsComponent = defineAsyncComponent(() => import('./views/EventsComponent.vue'))
+const FallthroughAttribute = defineAsyncComponent(() => import('./views/fallthroughAttributes/Index.vue'))
+// const Composables = defineAsyncComponent(() => import('./views/composables/Index.vue'))
+const CustomDirectives = defineAsyncComponent({
+  loader: () => import('./views/customDirectives/index.vue')
+})
 export default {
-  data() {
-    return {
-      toggleValue: sessionStorage.getItem("api") || "options",
-    };
-  },
-  components: {
+   components: {
     TemplateSyntax,
     ReactivityFundaments,
     ComputedProperties,
@@ -51,15 +59,36 @@ export default {
     Props,
     EventsComponent,
     FallthroughAttribute,
-    Composables,
+    // Composables,
     CustomDirectives,
   },
-  watch: {
+  data() {
+    return {
+      afterValue: '3',
+      toggleValue: sessionStorage.getItem("api") || "options",
+    };
+  },
+   watch: {
     toggleValue: function (value) {
       sessionStorage.setItem("api", value);
     },
-  }
+  },
+  beforeCreate(){
+    this.zzd = 1
+  },
+  mounted(){
+    console.log(this.zzd)
+    setTimeout(() => {
+      this.zzd = 333
+      console.log(this.zzd)
+    },5000)
+  },
+ 
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.skeleton{
+  background:#3e96f0;
+}
+</style>
