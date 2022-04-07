@@ -1,6 +1,7 @@
 <template>
   <div>
     {{ fullName }}
+    {{ name }}
   </div>
 </template>
 
@@ -13,6 +14,11 @@ export default {
     };
   },
   computed: {
+    name:function(vm){
+      console.log(this)
+      console.log(vm)
+      return vm.firstName
+    },
     fullName: {
       get() {
         return this.firstName + " " + this.lastName;

@@ -1,6 +1,5 @@
 <template>
 <!-- {{ obj.value }} -->
-{{ afterValue }}
   <!-- <input
     type="checkbox"
     v-model="toggleValue"
@@ -14,19 +13,19 @@
   <!-- <ClassStyleBinding /> -->
   <!-- <EventHanding /> -->
   <!-- <Watchers /> -->
+  <Emits/>
   <!-- <TemplateRefs /> -->
   <!-- <ComponentBasics /> -->
   <!-- <Props /> -->
   <!-- <FallthroughAttribute /> -->
   <!-- <Composables /> -->
    <!-- <CustomDirectives></CustomDirectives> -->
-   <Suspense>
+   <!-- <Suspense>
       <CustomDirectives></CustomDirectives>
-      <!-- 加载中状态 -->
           <template #fallback>
             <div class="skeleton"></div>
           </template>
-   </Suspense>
+   </Suspense> -->
 </template>
 <script>
 import { defineAsyncComponent } from "vue";
@@ -37,6 +36,7 @@ const ComputedProperties = defineAsyncComponent(() => import('./views/ComputedPr
 const ClassStyleBinding = defineAsyncComponent(() => import('./views/ClassStyleBinding.vue'))
 const EventHanding = defineAsyncComponent(() => import('./views/EventHanding.vue'))
 const Watchers = defineAsyncComponent(() => import('./views/Watchers.vue'))
+const Emits = defineAsyncComponent(() => import('./views/Emits.vue'))
 const TemplateRefs = defineAsyncComponent(() => import('./views/TemplateRefs.vue'))
 const ComponentBasics = defineAsyncComponent(() => import('./views/ComponentBasics.vue'))
 const Props = defineAsyncComponent(() => import('./views/Props.vue'))
@@ -54,6 +54,7 @@ export default {
     ClassStyleBinding,
     EventHanding,
     Watchers,
+    Emits,
     TemplateRefs,
     ComponentBasics,
     Props,
@@ -64,6 +65,7 @@ export default {
   },
   data() {
     return {
+      $string: '4',
       afterValue: '3',
       toggleValue: sessionStorage.getItem("api") || "options",
     };
@@ -77,10 +79,12 @@ export default {
     this.zzd = 1
   },
   mounted(){
-    console.log(this.zzd)
+    // console.log(this.$string)
+    // console.log(this.zzd)
+    // console.log(this.$data.$string)
     setTimeout(() => {
+      this.$string = 444
       this.zzd = 333
-      console.log(this.zzd)
     },5000)
   },
  
