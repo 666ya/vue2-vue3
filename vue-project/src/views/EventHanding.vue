@@ -2,9 +2,7 @@
   <div>
     <p @click="clikFn">
       <span v-on:click="count++">inline handler:{{ count }}</span>
-      <span v-on:click.once="say('message', $event)"
-        >inline handler access event argument</span
-      >
+      <span v-on:click.once="say('message', $event)">inline handler access event argument</span>
     </p>
     <p>
       <span v-on:click="increase">methods handler</span>
@@ -32,9 +30,18 @@ export default {
       //   event.stopPropagation();
       console.log(1);
     },
-    clikFn() {
+    /**
+     * 
+     * @param {*} a 
+     */
+    clikFn(a) {
       console.log(event);
+      return a
     },
+    /**
+     * 
+     * @param {*} event 
+     */
     increase(event) {
       alert(event.type);
     },

@@ -110,9 +110,21 @@
       </section>
     </div>
   </div>
+  <div class="template">
+    <div>
+      <p style="color: red;">{{templateTitle}}</p>
+    </div>
+  </div>
 </body>
-<script src="https://unpkg.com/vue@3"></script>
-<script src="src3/assets/vue.global.prod.js"></script>
+<script id="template" type="text/x-template">
+  <div>
+  <div>
+    <p style="color: red;">{{templateTitle}}</p>
+  </div>
+</div>
+</script>
+<!-- <script src="https://unpkg.com/vue@3"></script> -->
+<script src="./src3/assets/vue.global.js"></script>
 
 <script type="module">
   import { toLowerCasePlugin } from './src3/plugins/index.js'
@@ -150,7 +162,7 @@
         user: '张三',
         ok: false,
         title: 'Vue3',
-        curComponent: 'BaseReactivityCom',
+        curComponent: 'AppOptionsCom',
         apiList: [
           // {
           //   title: '插槽',
@@ -172,11 +184,11 @@
           //     name: 'AppApiCom',
           //     component: AppApiCom
           // },
-          // {
-          //   title: '选项',
-          //   name: 'AppOptionsCom',
-          //   component: AppOptionsCom
-          // },
+          {
+            title: '选项',
+            name: 'AppOptionsCom',
+            component: AppOptionsCom
+          },
           // {
           //    title: '实例property',
           //    name: 'InstancePropertyCom',
@@ -202,11 +214,11 @@
           //   name: 'CompositionApiCom',
           //   component: CompositionApiCom
           //   },
-            {
-             title: '响应性基础',
-             name: 'BaseReactivityCom',
-             component: BaseReactivityCom
-            }
+            // {
+            //  title: '响应性基础',
+            //  name: 'BaseReactivityCom',
+            //  component: BaseReactivityCom
+            // }
           //  {
           //     title: '非兼容变更',
           //     name: 'Diff',

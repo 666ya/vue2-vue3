@@ -1,19 +1,54 @@
 // render || template
 const {
-    h
+    h,
+    withDirectives,
+    resolveDirective
 } = Vue
 const template = `<div> {{ templateTitle }} </div>`
+
+const hInput = function (that) {
+    const focus = resolveDirective('focus')
+    // const ele = withDirectives('input', {
+    //     type: 'text',
+    //     value: that.value,
+    //     onInput: (event) => {
+    //         console.log(event.target.value)
+    //         that.value = event.target.value
+    //     }
+    // })
+    const ele = withDirectives(h('input', {
+        type: 'text',
+        value: that.value,
+        onInput: (event) => {
+            console.log(event.target.value)
+            that.value = event.target.value
+        }
+    }), [
+        [focus]
+    ])
+    return ele
+}
 const RenderCom = {
     render() {
-        return h('div', this.$slots.default())
+        console.log(this.$slots)
+        // return h('div', [
+        //     h('p', this.$slots.default && this.$slots.default()),
+        //     h('p', this.$slots.header && this.$slots.header())
+        // ])
+        return [
+            hInput(this),
+            h('template', this.value)
+        ]
+        // return hInput(this)
     },
     data() {
         return {
+            value: '',
             renderTitle: 'render函数渲染模板(优先级更高)',
             templateTitle: 'tempalte模板'
         }
     },
-    template: template
+    template: '.template'
 }
 // data
 const dataTemplate = `<div>{{ obj.b }}</div>`
@@ -194,5 +229,13 @@ export default {
         ExtendCom,
         SourceCom
     },
-    template: '<extend-com></extend-com>'
+    render() {
+        return h(RenderCom, {
+            id: 'container'
+        }, {
+            default: () => 'default slot',
+            header: () => 'header slot'
+        })
+    },
+    template: '<render-com></render-com>'
 }
