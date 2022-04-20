@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    var obj = {
+        count: 1
+    }
+    var proxy = new Proxy(obj, {
+        get: function (target, key) {
+            var a = target[key]
+            console.log('get')
+            return a
+        },
+        set(target, key, value) {
+            console.log('set')
+            target[key] = value
+        }
+    })
+    proxy.a = 'b'
+    console.log(obj)
+    // proxy.count = 2
+    // console.log(proxy.count)
+    // console.log(obj.count)
+</script>
+
+</html>
