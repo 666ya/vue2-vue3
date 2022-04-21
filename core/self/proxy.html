@@ -12,25 +12,146 @@
 
 </body>
 <script>
-    var obj = {
-        count: 1
-    }
-    var proxy = new Proxy(obj, {
-        get: function (target, key) {
-            var a = target[key]
-            console.log('get')
-            return a
-        },
-        set(target, key, value) {
-            console.log('set')
-            target[key] = value
+    'use strict';
+
+    console.log(2.5 >> 0)
+    /**
+     *  get拦截eg
+     */
+    // get拦截可继承
+    let proto = new Proxy({}, {
+        get(target, key, receiver) {
+            console.log('GET ' + key)
+            return target[key]
         }
     })
-    proxy.a = 'b'
-    console.log(obj)
-    // proxy.count = 2
-    // console.log(proxy.count)
-    // console.log(obj.count)
+    let getObj = Object.create(proto)
+    // get拦截实现获取数据负数索引
+    // const array = [1, 2, 3, 4]
+    // console.log(array[-1]) // undefined
+    const array = createArray([1, 2, 3, 4])
+
+    function createArray(array) {
+        const handler = {
+            get(target, key, receiver) {
+                const index = Number(key)
+                if (index < 0) {
+                    key = String(target.length + index);
+                }
+                return Reflect.get(target, key, receiver);
+            }
+        }
+        let target = [...array]
+        return new Proxy(target, handler)
+    }
+    // get 实现读取属性链式操作
+    var pipeFn = function (arg) {
+        let funStack = []
+        var proxy = new Proxy({}, {
+            get({}, fnName) {
+                if (fnName === 'get') {
+                    return funStack.reduce((params, curFn) => {
+                        return curFn(params)
+                    }, arg)
+                }
+                if (window[fnName]) {
+                    funStack.push(window[fnName])
+                    return proxy
+                }
+            }
+        })
+        return proxy
+    }
+    var double = n => n * 2
+    var pow = n => n * n
+    var reverseInt = n => n.toString().split('').reverse().join('') | 0
+    var result = pipeFn(50).double.reverseInt.get
+    // console.log(result)
+    // get 第三个参数
+    const receiver = new Proxy({}, {
+        get(target, key, receiver) {
+            return receiver
+        }
+    })
+    const re = receiver.getReceiver
+    // get 不能改写
+    const obj = Object.defineProperty({}, 'foo', {
+        value: 'foo',
+        writable: false,
+        configurable: false
+    })
+    const objProxy = new Proxy(obj, {
+        get(target, key) {
+            return 'aaa'
+        }
+    })
+    // objProxy.foo = 'bar'
+    // console.log(objProxy.foo)
+
+    /**
+     * set t拦截eg
+     */
+    const setHandler = {
+        set(obj, prop, value) {
+            obj[prop] = value
+            return obj
+        }
+    }
+    const setProxy = new Proxy({}, setHandler)
+    setProxy.foo = 'bar'
+    // console.log(setProxy.foo)
+    /**
+     * has 拦截eg
+     */
+    const hasObj = {
+        _name: 'test',
+        name: '李白',
+        age: 12
+    }
+    const hasProxy = new Proxy(hasObj, {
+        has(target, key) {
+            return true
+        }
+    })
+    // console.log('name' in hasProxy)
+
+
+    /**
+     * deleteProperty 拦截eg
+     */
+    const deleteObj = {
+        _prop: 'foo'
+    }
+    const deleteProxy = new Proxy(deleteObj, {
+        deleteProperty(target, key) {
+            delete target[key]
+            return target
+        }
+    })
+    delete deleteProxy._prop
+    // console.log(deleteObj)
+    /**
+     * ownKeys 拦截eg
+     */
+    var symbol = Symbol('aaa')
+    const ownKyesTarget = {
+        a: 1,
+        b: 2,
+        c: 3,
+        [symbol]: 'aaa'
+    }
+    Object.defineProperty(ownKyesTarget, 'a', {
+        configurable: false
+    })
+    const ownKeysProxxy = new Proxy(ownKyesTarget, {
+        ownKeys(ownKyesTarget) {
+            return ['b', 'a', 'c']
+            // return Reflect.ownKeys(ownKyesTarget)
+        }
+    })
+    // console.log(ownKeysProxxy.a)
+    // console.log(Object.keys(ownKeysProxxy))
+    console.log(Object.getOwnPropertyNames(ownKeysProxxy))
 </script>
 
 </html>
