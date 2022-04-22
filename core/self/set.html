@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <p id="el"></p>
+        <button id="button">按钮</button>
+    </div>
+</body>
+<script>
+    /** 
+     *  set
+     */
+    var a = [1, 2, 3, 4]
+    var b = [3, 4, 5, 6]
+    // 并集
+    const union = [...new Set([...a, ...b])]
+    // 交集
+    const intersetcion = a.filter(item => new Set(b).has(item))
+    // 差集
+    const diff = a.filter(item => !new Set(b).has(item))
+    /**
+     * WeatSet
+     */
+    var weakSet = new WeakSet()
+    var obj = {
+        name: 'Jhon'
+    }
+    var objnew = obj
+    weakSet.add(objnew)
+    // console.log(weakSet)
+    obj = null
+    // console.log(weakSet)
+    /**
+     *  Map
+     */
+    console.log(Map.prototype)
+    const m2 = new Map([
+        ['baz', 3]
+    ])
+    m2.set(1, 'aaa')
+    console.log(m2)
+
+    /**
+     *  WeakMap
+     */
+    var el = document.getElementById('el')
+    let weakMap = new WeakMap()
+    weakMap.set(el, 'a')
+    console.log(weakMap)
+    document.getElementById('button').onclick = function () {
+        document.getElementById('app').removeChild(document.getElementById('el'))
+        el = null
+    }
+</script>
+
+</html>
