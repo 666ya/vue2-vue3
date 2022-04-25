@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- <div class="container"></div> -->
+        <div innerHTML="bbb" v-show="show">aaa</div>
+        <!-- <span style="font-size: 100px;"></span> -->
+        <!-- <div :title="title">attrs</div> -->
+        <!-- <input v-show="show" v-focus /> -->
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    var ChildComp = {
+        data() {
+            return {
+                foo: 'foo'
+            }
+        }
+    }
+    var appOptions = {
+        components: {
+            ChildComp
+        },
+        data() {
+            return {
+                show: true,
+                title: 'attrs',
+                count: 1
+            }
+        },
+        mounted() {
+            setTimeout(() => {
+                this.show = false
+            }, 2000);
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.config.compilerOptions.comments = false
+    app.directive('focus', {
+        created() {
+            console.log('directive created')
+        },
+        beforeMount() {
+            console.log('directive created')
+        }
+    })
+    app.mount('#app')
+</script>
+
+</html>
