@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* .parent-box {
+            border: 1px solid black;
+        } */
+
+        .child-box {
+            border: 1px solid gray
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <parent-comp></parent-comp>
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    var ChildComp = {
+        data() {
+            return {
+                childText: '子组件内容'
+            }
+        },
+        template: '<div class="child-box">{{childText}}</div>'
+    }
+    var ParentComp = {
+        components: {
+            ChildComp
+        },
+        data() {
+            return {
+                parentText: '父组件内容'
+            }
+        },
+        template: `<div class="parent-box"><p>{{parentText}}</p><child-comp></child-comp></div>`
+    }
+    var appOptions = {
+        components: {
+            ParentComp
+        },
+        data() {
+            return {
+                show: true,
+                title: 'attrs',
+                count: 1
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
