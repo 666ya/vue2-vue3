@@ -25,6 +25,12 @@
 <script src="../../dist/vue.global.js"></script>
 <script>
     var ChildComp = {
+        props: {
+            form: {
+                type: Object,
+                default: () => { }
+            }
+        },
         data() {
             return {
                 childText: '子组件内容'
@@ -36,6 +42,9 @@
         components: {
             ChildComp
         },
+        provide: {
+            parentMsg: 'parent'
+        },
         data() {
             return {
                 parentText: '父组件内容'
@@ -44,8 +53,20 @@
         template: `<div class="parent-box"><p>{{parentText}}</p><child-comp></child-comp></div>`
     }
     var appOptions = {
+        props: {
+            user: {
+                type: Boolean
+            },
+            unit: {
+                required: true,
+                default: 'aaa'
+            }
+        },
         components: {
             ParentComp
+        },
+        provide: {
+            appMsg: 'app'
         },
         data() {
             return {
@@ -55,7 +76,10 @@
             }
         }
     }
-    var app = Vue.createApp(appOptions)
+    var app = Vue.createApp(appOptions, {
+        user: '李白'
+    })
+    app.provide('globalMsg', 'global')
     app.mount('#app')
 </script>
 
