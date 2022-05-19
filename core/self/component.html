@@ -24,13 +24,8 @@
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
+    // 子组件
     var ChildComp = {
-        props: {
-            form: {
-                type: Object,
-                default: () => { }
-            }
-        },
         data() {
             return {
                 childText: '子组件内容'
@@ -38,6 +33,7 @@
         },
         template: '<div class="child-box">{{childText}}</div>'
     }
+    // 父组件
     var ParentComp = {
         components: {
             ChildComp
@@ -52,14 +48,36 @@
         },
         template: `<div class="parent-box"><p>{{parentText}}</p><child-comp></child-comp></div>`
     }
+    // 根组件
+    var selfMixin = {
+        props: {
+            'selfMixin': {
+                default: 'selfMixin'
+            },
+            'commonTest': {
+                default: 'selfMixinText'
+            }
+        }
+    }
+    var selfExtend = {
+        props: {
+            'extendProps': {
+                default: 'extendProps'
+            },
+            'commonTest': {
+                default: 'extendTest'
+            }
+        }
+    }
     var appOptions = {
+        // extends: selfExtend,
+        // mixins: [selfMixin],
         props: {
             user: {
-                type: Boolean
-            },
-            unit: {
-                required: true,
                 default: 'aaa'
+            },
+            'globalMinxinArray': {
+                type: true
             }
         },
         components: {
@@ -77,8 +95,16 @@
         }
     }
     var app = Vue.createApp(appOptions, {
-        user: '李白'
+        user: false,
+        globalMinxinArray: false
     })
+    // app.mixin({
+    //     props: {
+    //         'globalMinxinArray': {
+    //             type: true
+    //         }
+    //     }
+    // })
     app.provide('globalMsg', 'global')
     app.mount('#app')
 </script>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent-box {
+            border: 1px solid greenyellow;
+        }
+
+        .child-box {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <com-props :title="title" @click="handleClickFunction"></com-props>
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    var mixinx = {
+        props: {
+            user: String
+        }
+    }
+    // 父组件
+    var ComProps = {
+        // mixins: [mixinx],
+        // emits: ['click'],
+        props: {
+            form: {
+                type: Object,
+                default() {
+                    return {
+                        a: 'aaa'
+                    }
+                }
+            },
+            propFn: {
+                type: Function,
+                default: () => {
+                    return 'aaa'
+                },
+            }
+            // onClick: {
+            //     type: Function
+            // }
+            // foo: () => ({
+            //     default: 'foo'
+            // }),
+            // form: {
+            //     default: 'aaa'
+            // },
+            // user: {
+            //     default: (rawProps) => {
+            //         console.log(rawProps.count)
+            //         return rawProps.count
+            //     }
+            // },
+            // count: {
+            //     type: String,
+            //     default: 'aaa'
+            // }
+        },
+        data() {
+            return {
+                parentText: '子组件内容'
+            }
+        },
+        mounted() {
+            console.log(this)
+            // console.log(this.$props)
+            // this.$emit('click')
+        },
+        methods: {
+            handleOriginalClick() {
+                console.log('原生事件')
+            },
+        },
+        template: `<div class="parent-box" @click="onClick"><p>{{parentText}}</p><p>comonentProps:{{ propFn()}}</p></div>`
+    }
+    var appOptions = {
+        components: {
+            ComProps
+        },
+        provide: {
+            appMsg: 'app'
+        },
+        data() {
+            return {
+                show: true,
+                title: 'title',
+                count: 1
+            }
+        },
+        methods: {
+            handleClickFunction() {
+                console.log('组件emit触发事件')
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
