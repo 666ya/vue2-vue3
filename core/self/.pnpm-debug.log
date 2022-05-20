@@ -1,0 +1,16 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1,
+    "workspacePrefix": "E:\\self\\core"
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_SCRIPT",
+    "hint": "But build is present in the root of the workspace,\nso you may run \"pnpm -w run build\"",
+    "err": {
+      "name": "pnpm",
+      "message": "Missing script: build",
+      "code": "ERR_PNPM_NO_SCRIPT",
+      "stack": "pnpm: Missing script: build\n    at Object.handler (C:\\Users\\Administrator\\AppData\\Local\\nvs\\node\\16.14.0\\x64\\node_modules\\pnpm\\dist\\pnpm.cjs:177990:19)\n    at async C:\\Users\\Administrator\\AppData\\Local\\nvs\\node\\16.14.0\\x64\\node_modules\\pnpm\\dist\\pnpm.cjs:182247:21\n    at async run (C:\\Users\\Administrator\\AppData\\Local\\nvs\\node\\16.14.0\\x64\\node_modules\\pnpm\\dist\\pnpm.cjs:182221:34)\n    at async runPnpm (C:\\Users\\Administrator\\AppData\\Local\\nvs\\node\\16.14.0\\x64\\node_modules\\pnpm\\dist\\pnpm.cjs:182440:5)\n    at async C:\\Users\\Administrator\\AppData\\Local\\nvs\\node\\16.14.0\\x64\\node_modules\\pnpm\\dist\\pnpm.cjs:182432:7"
+    }
+  }
+}

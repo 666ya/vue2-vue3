@@ -19,7 +19,7 @@
 
 <body>
     <div id="app">
-        <com-props :title="title" @click="handleClickFunction"></com-props>
+        <com-props :title="title" @click="handleClickFunction" :count="count"></com-props>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -34,6 +34,9 @@
         // mixins: [mixinx],
         // emits: ['click'],
         props: {
+            count: {
+                type: Number
+            },
             form: {
                 type: Object,
                 default() {
@@ -48,25 +51,6 @@
                     return 'aaa'
                 },
             }
-            // onClick: {
-            //     type: Function
-            // }
-            // foo: () => ({
-            //     default: 'foo'
-            // }),
-            // form: {
-            //     default: 'aaa'
-            // },
-            // user: {
-            //     default: (rawProps) => {
-            //         console.log(rawProps.count)
-            //         return rawProps.count
-            //     }
-            // },
-            // count: {
-            //     type: String,
-            //     default: 'aaa'
-            // }
         },
         data() {
             return {
@@ -83,7 +67,7 @@
                 console.log('原生事件')
             },
         },
-        template: `<div class="parent-box" @click="onClick"><p>{{parentText}}</p><p>comonentProps:{{ propFn()}}</p></div>`
+        template: `<div class="parent-box" @click="onClick"><p>{{parentText}}</p><p>comonentProps:{{ count}}</p></div>`
     }
     var appOptions = {
         components: {
@@ -98,6 +82,11 @@
                 title: 'title',
                 count: 1
             }
+        },
+        mounted() {
+            setTimeout(() => {
+                this.count = 2
+            }, 3000)
         },
         methods: {
             handleClickFunction() {
