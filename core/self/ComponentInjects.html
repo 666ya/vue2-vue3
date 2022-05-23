@@ -24,32 +24,9 @@
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    var mixinx = {
-        props: {
-            user: String
-        }
-    }
-    // 父组件
+    // 子组件
     var ComProps = {
-        props: {
-            count: {
-                type: Number
-            },
-            form: {
-                type: Object,
-                default() {
-                    return {
-                        a: 'aaa'
-                    }
-                }
-            },
-            propFn: {
-                type: Function,
-                default: () => {
-                    return 'aaa'
-                },
-            }
-        },
+        inject: ['count'],
         data() {
             return {
                 parentText: '子组件内容'
@@ -57,8 +34,7 @@
         },
         mounted() {
             console.log(this)
-            console.log(this['_'])
-            // console.log(this.$props.count++)
+            console.log(this.$props.count++)
             // console.log(this.$props)
             // this.$emit('click')
         },
@@ -72,6 +48,10 @@
     var appOptions = {
         components: {
             ComProps
+        },
+        provides: {
+            count: 1,
+            title: 'parentProvide'
         },
         data() {
             return {
@@ -94,8 +74,8 @@
     var app = Vue.createApp(appOptions)
     // 全局混入
     app.mixin({
-        props: {
-            globalMixin: 'globalMixin'
+        provides: {
+            globalProvide: 'globalProvide'
         }
     })
     app.mount('#app')
