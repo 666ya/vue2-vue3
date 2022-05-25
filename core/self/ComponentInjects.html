@@ -25,6 +25,11 @@
 <script src="../../dist/vue.global.js"></script>
 <script>
     // 子组件
+    var mixin = {
+        inject: {
+            title: ''
+        }
+    }
     var ComProps = {
         inject: ['count'],
         data() {
@@ -35,6 +40,7 @@
         mounted() {
             console.log(this)
             console.log(this.$props.count++)
+            console.log(this.proxy)
             // console.log(this.$props)
             // this.$emit('click')
         },
