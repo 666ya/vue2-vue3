@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent-box {
+            border: 1px solid greenyellow;
+        }
+
+        .child-box {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <com-props :title="title"></com-props>
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    // 子组件
+    var ComProps = {
+        data() {
+            return {
+                parentText: '子组件内容'
+            }
+        },
+        computed: {
+            count() {
+                return 1
+            }
+        },
+        mounted() {
+            this.count = 2
+        },
+        template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ count}}</p></div>`
+    }
+    var appOptions = {
+        components: {
+            ComProps
+        },
+        data() {
+            return {
+                show: true,
+                title: 'title',
+                count: 1
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    // 全局混入
+    app.mixin({
+        provides: {
+            globalProvide: 'globalProvide'
+        }
+    })
+    app.mount('#app')
+</script>
+
+</html>

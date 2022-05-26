@@ -19,7 +19,7 @@
 
 <body>
     <div id="app">
-        <com-props :title="title" @click="handleClickFunction" :count="count"></com-props>
+        <com-props :title="title" :count="count"></com-props>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -55,9 +55,14 @@
                 parentText: '子组件内容'
             }
         },
+        computed: {
+            isShow() {
+                return true
+            }
+        },
         mounted() {
-            console.log(this)
-            console.log(this['_'])
+            // console.log(this)
+            // console.log(this['_'])
             // console.log(this.$props.count++)
             // console.log(this.$props)
             // this.$emit('click')
@@ -67,7 +72,7 @@
                 console.log('原生事件')
             },
         },
-        template: `<div class="parent-box" @click="onClick"><p>{{parentText}}</p><p>comonentProps:{{ count}}</p></div>`
+        template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ count}}</p></div>`
     }
     var appOptions = {
         components: {
@@ -81,9 +86,9 @@
             }
         },
         mounted() {
-            setTimeout(() => {
-                this.count = 2
-            }, 3000)
+            // setTimeout(() => {
+            //     this.count = 2
+            // }, 3000)
         },
         methods: {
             handleClickFunction() {
