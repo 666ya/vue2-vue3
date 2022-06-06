@@ -19,6 +19,7 @@
 
 <body>
     <div id="app">
+        {{ title }}
         <com-props :title="title" :count="count"></com-props>
     </div>
 </body>
@@ -67,6 +68,9 @@
             // console.log(this.$props)
             // this.$emit('click')
         },
+        beforeUpdate() {
+            console.log('子组件beforeUpdate')
+        },
         methods: {
             handleOriginalClick() {
                 console.log('原生事件')
@@ -86,9 +90,10 @@
             }
         },
         mounted() {
-            // setTimeout(() => {
-            //     this.count = 2
-            // }, 3000)
+            setTimeout(() => {
+                // this.title = 'changed'
+                this.count = 2
+            }, 3000)
         },
         methods: {
             handleClickFunction() {

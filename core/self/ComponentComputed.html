@@ -19,7 +19,9 @@
 
 <body>
     <div id="app">
-        <com-props :title="title"></com-props>
+        <div v-if="show">{{a}}</div>
+        <div v-else>{{b}}</div>
+        <!-- <com-props></com-props> -->
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -28,18 +30,23 @@
     var ComProps = {
         data() {
             return {
-                parentText: '子组件内容'
+                text: '子组件内容',
+                count: 1
             }
         },
         computed: {
-            count() {
-                return 1
+            seftCount() {
+                return this.count * 10
             }
         },
         mounted() {
             this.count = 2
+            // this.count = 2
+            // setTimeout(() => {
+            //     this.count = 2
+            // }, 2000)
         },
-        template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ count}}</p></div>`
+        template: `<div class="parent-box"><p>{{text}}</p><p>comonentProps{{seftCount}}</p></div>`
     }
     var appOptions = {
         components: {
@@ -48,9 +55,17 @@
         data() {
             return {
                 show: true,
-                title: 'title',
-                count: 1
+                a: 'a',
+                b: 'b'
             }
+        },
+        mounted() {
+            setTimeout(() => {
+                this.show = false
+            }, 5000)
+            setTimeout(() => {
+                this.a = 4
+            }, 6000)
         }
     }
     var app = Vue.createApp(appOptions)

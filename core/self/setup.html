@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <h1>{{msg}}</h1>
+        <p>{{count}}</p>
+        <p> {{obj.count}}</p>
+        <button @click="inc">inc</button>
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { ref } = Vue
+    var appOptions = {
+
+        setup() {
+            const msg = ref('我变了，obj.count也会变，count却不会')
+            let count = 1
+            let obj = {
+                count: 10
+            }
+            const inc = () => {
+                count += 1
+                obj.count += 1
+                msg.value = msg.value.split('').reverse().join('')
+            }
+            return {
+                count,
+                obj,
+                msg,
+                inc
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
