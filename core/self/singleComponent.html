@@ -7,58 +7,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        .parent-box {
-            border: 1px solid greenyellow;
-        }
+        /* .parent-box {
+            border: 1px solid black;
+        } */
 
         .child-box {
-            background: red;
+            border: 1px solid gray
         }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <com-props></com-props>
+        <parent-comp></parent-comp>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    // 子组件
-    var ComProps = {
+    // 父组件
+    var ParentComp = {
         data() {
             return {
-                // text: '子组件内容',
-                count: 1
-            }
-        },
-        computed: {
-            seftCount() {
-                return 10
-                // return this.count * 10
+                parentText: '父组件内容'
             }
         },
         mounted() {
             setTimeout(() => {
-                console.log(this.seftCount)
+                this.parentText = '父组件内容改变'
             }, 2000)
         },
-        template: `<div class="parent-box"><p>comonentProps{{seftCount}}</p></div>`
+        template: `<div class="parent-box"><p>{{parentText}}</p></div>`
     }
     var appOptions = {
         components: {
-            ComProps
+            ParentComp
+        },
+        data() {
+            return {
+                show: true,
+                title: 'attrs',
+                count: 1
+            }
         }
     }
     var app = Vue.createApp(appOptions)
-    // 全局混入
-    app.mixin({
-        provides: {
-            globalProvide: 'globalProvide'
-        }
-    })
     app.mount('#app')
 </script>
-<script src="./map.js"></script>
 
 </html>

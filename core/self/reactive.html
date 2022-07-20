@@ -10,41 +10,31 @@
 
 <body>
     <div id="app">
-        <div v-show="show">aaa</div>
+        {{ data.book.name }}
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
+    const { reactive, onMounted } = Vue
     var appOptions = {
-        data() {
-            return {
-                show: true,
-                title: 'attrs',
-                count: 1
-            }
-        },
         setup() {
-            const show = Vue.ref(false)
+            const data = reactive({
+                book: {
+                    name: '名字',
+                    year: '2018'
+                }
+            })
+            // onMounted(() => {
+            //     setTimeout(() => {
+            //         data.book.name = '名字改变'
+            //     }, 2000)
+            // })
             return {
-                show
+                data
             }
-        },
-        mounted() {
-            setTimeout(() => {
-                this.show = !this.show
-            }, 2000);
         }
     }
     var app = Vue.createApp(appOptions)
-    app.config.compilerOptions.comments = false
-    app.directive('focus', {
-        created() {
-            console.log('directive created')
-        },
-        beforeMount() {
-            console.log('directive created')
-        }
-    })
     app.mount('#app')
 </script>
 

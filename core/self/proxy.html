@@ -14,10 +14,26 @@
 <script>
     'use strict';
 
-    console.log(2.5 >> 0)
     /**
      *  get拦截eg
      */
+    const bookSotre = {
+        book1: {
+            name: 'book1',
+            year: '2017'
+        },
+        book2: {
+            name: 'book2',
+            year: '2019'
+        }
+    }
+    const bookProxy = new Proxy(bookSotre, {
+        get(target, key, receiver) {
+            console.log(key)
+            return target[key]
+        }
+    })
+    console.log(bookProxy.book1.name)
     // get拦截可继承
     let proto = new Proxy({}, {
         get(target, key, receiver) {
@@ -48,7 +64,7 @@
     var pipeFn = function (arg) {
         let funStack = []
         var proxy = new Proxy({}, {
-            get({}, fnName) {
+            get({ }, fnName) {
                 if (fnName === 'get') {
                     return funStack.reduce((params, curFn) => {
                         return curFn(params)

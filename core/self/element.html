@@ -10,49 +10,24 @@
 
 <body>
     <div id="app">
-        <!-- <div class="container"></div> -->
-        <div innerHTML="bbb" v-show="show">aaa</div>
-        <!-- <span style="font-size: 100px;"></span> -->
-        <!-- <div :title="title">attrs</div> -->
-        <!-- <input v-show="show" v-focus /> -->
+        <p>{{ count }}</p>
+        <p>{{ book.year }}</p>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    var ChildComp = {
-        data() {
-            return {
-                foo: 'foo'
-            }
-        }
-    }
     var appOptions = {
-        components: {
-            ChildComp
-        },
         data() {
             return {
-                show: true,
-                title: 'attrs',
-                count: 1
+                book: {
+                    year: '2022',
+                    title: '测试'
+                },
+                count: 0
             }
-        },
-        mounted() {
-            setTimeout(() => {
-                this.show = false
-            }, 2000);
         }
     }
     var app = Vue.createApp(appOptions)
-    app.config.compilerOptions.comments = false
-    app.directive('focus', {
-        created() {
-            console.log('directive created')
-        },
-        beforeMount() {
-            console.log('directive created')
-        }
-    })
     app.mount('#app')
 </script>
 
