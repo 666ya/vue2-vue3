@@ -10,7 +10,7 @@
 
 <body>
     <div id="app">
-        <p>{{ count }}</p>
+        <!-- <p>{{ count }}</p> -->
         <p>{{ book.year }}</p>
     </div>
 </body>
@@ -20,8 +20,10 @@
         data() {
             return {
                 book: {
-                    year: '2022',
-                    title: '测试'
+                    info: {
+                        title: '测试'
+                    },
+                    year: '2022'
                 },
                 count: 0
             }

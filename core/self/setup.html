@@ -10,27 +10,47 @@
 
 <body>
     <div id="app">
-        {{ data.book.name }}
+        <!-- <p>{{ deepData.name }}</p> -->
+        <!-- <p>{{ skipData.name }}</p> -->
+        <p>{{ sealData.name }}</p>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { reactive, onMounted } = Vue
+    const { reactive, onMounted, isReactive } = Vue
     var appOptions = {
         setup() {
-            const data = reactive({
+            /*
+             *  reactive
+             */
+            // deep
+            const obj = {
                 book: {
                     name: '名字',
                     year: '2018'
                 }
+            }
+            console.log(obj['__v_isReactive'])
+            const deepData = reactive(obj)
+            console.log(deepData['__v_isReactive'])
+            // console.log(isReactive(deepData))
+            /**
+             * specific: __v_skip
+             */
+            const skipData = reactive({
+                name: '测试',
+                __v_skip: true
             })
+            const sealData = reactive(Object.seal({
+                name: 'seal'
+            }))
             // onMounted(() => {
-            //     setTimeout(() => {
-            //         data.book.name = '名字改变'
-            //     }, 2000)
+            //     skipData.name = '测试修改'
             // })
             return {
-                data
+                // deepData,
+                skipData,
+                sealData
             }
         }
     }
