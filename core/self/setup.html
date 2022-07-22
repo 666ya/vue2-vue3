@@ -10,9 +10,15 @@
 
 <body>
     <div id="app">
-        <!-- <p>{{ deepData.name }}</p> -->
+        {{ arrayReactive.includes(1) }}
+        <!-- <p>{{ deepData.book.year }}</p> -->
+        <!-- <p>
+            <span v-for="item in arrayReactive">
+                {{ item }}
+            </span>
+        </p> -->
         <!-- <p>{{ skipData.name }}</p> -->
-        <p>{{ sealData.name }}</p>
+        <!-- <p>{{ sealData.name }}</p> -->
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -24,33 +30,39 @@
              *  reactive
              */
             // deep
-            const obj = {
-                book: {
-                    name: '名字',
-                    year: '2018'
-                }
-            }
-            console.log(obj['__v_isReactive'])
-            const deepData = reactive(obj)
-            console.log(deepData['__v_isReactive'])
-            // console.log(isReactive(deepData))
+            // const obj = {
+            //     book: {
+            //         name: '名字',
+            //         year: '2018'
+            //     }
+            // }
+            // const deepData = reactive(obj)
+            // ArrayInstruments
+            const array = [1, 2, 3, 4, 5]
+            let arrayReactive = reactive(array)
+            console.log(arrayReactive)
             /**
              * specific: __v_skip
              */
-            const skipData = reactive({
-                name: '测试',
-                __v_skip: true
-            })
-            const sealData = reactive(Object.seal({
-                name: 'seal'
-            }))
-            // onMounted(() => {
-            //     skipData.name = '测试修改'
+            // const skipData = reactive({
+            //     name: '测试',
+            //     __v_skip: true
             // })
+            // const sealData = reactive(Object.seal({
+            //     name: 'seal'
+            // }))
+            onMounted(() => {
+                setTimeout(() => {
+                    array.push('1')
+                    // arrayReactive = [2, 4]
+                    console.log(arrayReactive)
+                }, 5000)
+            })
             return {
                 // deepData,
-                skipData,
-                sealData
+                arrayReactive
+                // skipData,
+                // sealData
             }
         }
     }
