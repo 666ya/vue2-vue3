@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{ arrayReactive.includes(1) }}
+        <!-- <p>{{ deepData.book.year }}</p> -->
+        <!-- <p>
+            <span v-for="item in arrayReactive">
+                {{ item }}
+            </span>
+        </p> -->
+        <!-- <p>{{ skipData.name }}</p> -->
+        <!-- <p>{{ sealData.name }}</p> -->
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { reactive, onMounted, isReactive, watchEffect } = Vue
+    var appOptions = {
+        setup() {
+            /*
+             *  reactive
+             */
+            // deep
+            // const obj = {
+            //     book: {
+            //         name: '名字',
+            //         year: '2018'
+            //     }
+            // }
+            // const deepData = reactive(obj)
+            // ArrayInstruments
+            const array = []
+            let arrayReactive = reactive(array)
+            watchEffect(() => {
+                console.log('1')
+                arrayReactive.push(1)
+            })
+            watchEffect(() => {
+                console.log('2')
+                arrayReactive.push(2)
+            })
+            // console.log(arrayReactive)
+            /**
+             * specific: __v_skip
+             */
+            // const skipData = reactive({
+            //     name: '测试',
+            //     __v_skip: true
+            // })
+            // const sealData = reactive(Object.seal({
+            //     name: 'seal'
+            // }))
+            // onMounted(() => {
+            //     setTimeout(() => {
+            //         array.push('1')
+            //         // arrayReactive = [2, 4]
+            //         console.log(arrayReactive)
+            //     }, 5000)
+            // })
+            return {
+                // deepData,
+                arrayReactive
+                // skipData,
+                // sealData
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
