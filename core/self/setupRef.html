@@ -10,35 +10,52 @@
 
 <body>
     <div id="app">
-        <!-- {{count }} -->
-        <!-- <p>{{ deepData.book.year }}</p> -->
-        <!-- <p>
-            <span v-for="item in arrayReactive">
-                {{ item }}
-            </span>
-        </p> -->
-        <!-- <p>{{ skipData.name }}</p> -->
-        <!-- <p>{{ sealData.name }}</p> -->
+        {{refReadonly.child.title }}
+        {{refReadonly.count }}
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { shallowRef, ref, isReactive, reactive, isRef, watchEffect, toRaw } = Vue
+    const { isProxy, shallowRef, ref, isReactive, reactive, isRef, watchEffect, toRaw, onMounted, readonly, shallowReactive, watchPostEffect } = Vue
     var appOptions = {
         setup() {
-            // const reactiveObj = reactive({
-            //     name: '测试'
-            // })
-            // const shallowRefObj = shallowRef({
-            //     name: '测试'
-            // })
-            // const refObj = ref(reactiveObj)
-            // console.log(isReactive(shallowRefObj.value))
-            // console.log(refObj.value === reactiveObj)
-            const count = ref(1)
-            console.log(toRaw(count))
+            const rawObject = {
+                count: 1,
+                child: {
+                    title: 'rawObject'
+                }
+            }
+            // rr
+            const rr = ref(rawObject)
+            // ref(reactive)
+            const reactiveObj = reactive(rawObject)
+            const refReactive = ref(reactiveObj)
+            // ref(readonly)
+            const readonlyObj = readonly(rawObject)
+            const refReadonly = ref(readonlyObj)
+            // ref(shallow)
+            const shallowObj = shallowReactive(rawObject)
+            const refShallow = ref(shallowObj)
+            console.log(refShallow)
+            watchEffect(() => {
+                console.log(refShallow.value.count)
+                console.log(refShallow.value.child.title)
+            })
+            onMounted(() => {
+                setTimeout(() => {
+                    // refReadonly.value.count++
+                    // refShallow.value = shallowObj
+                    refShallow.value.child.title = '再次改变'
+                    // setTimeout(() => {
+                    //     refShallow.value.child.title = '再次改变'
+                    // }, 2000)
+                }, 2000)
+            })
             return {
-                count
+                rr,
+                refReactive,
+                refReadonly,
+                refShallow
             }
         }
     }
