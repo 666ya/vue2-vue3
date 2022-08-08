@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{readonlyProxy.child.title }}
+        {{readonlyProxy.count }}
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { onMounted, readonly, watchEffect, reactive } = Vue
+    var appOptions = {
+        setup() {
+            const rawObject = {
+                count: 1,
+                child: {
+                    title: 'rawObject'
+                }
+            }
+            // reanonlyRaw
+            const readonlyProxy = readonly(rawObject)
+            console.log(readonlyProxy)
+            // readonly(reactive)
+            // const reactiveObj = reactive(rawObject)
+            // const readonlyReactive = readonly(reactiveObj)
+            watchEffect(() => {
+                console.log(readonlyProxy.count)
+                // console.log(readonlyProxy.child.title)
+            })
+            onMounted(() => {
+                setTimeout(() => {
+                    // refReadonly.value.count++
+                    // refShallow.value = shallowObj
+                    console.log(readonlyProxy.count++)
+                    // setTimeout(() => {
+                    //     refShallow.value.child.title = '再次改变'
+                    // }, 2000)
+                }, 2000)
+            })
+            return {
+                readonlyProxy,
+                // readonlyReactive
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
