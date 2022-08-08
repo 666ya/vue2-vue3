@@ -10,8 +10,8 @@
 
 <body>
     <div id="app">
-        {{readonlyProxy.child.title }}
-        {{readonlyProxy.count }}
+        <!-- {{readonlyReactive.child.title }}
+        {{readonlyReactive.count }} -->
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -26,27 +26,23 @@
                 }
             }
             // reanonlyRaw
-            const readonlyProxy = readonly(rawObject)
-            console.log(readonlyProxy)
+            // const readonlyProxy = readonly(rawObject)
             // readonly(reactive)
-            // const reactiveObj = reactive(rawObject)
-            // const readonlyReactive = readonly(reactiveObj)
-            watchEffect(() => {
-                console.log(readonlyProxy.count)
-                // console.log(readonlyProxy.child.title)
-            })
-            onMounted(() => {
-                setTimeout(() => {
-                    // refReadonly.value.count++
-                    // refShallow.value = shallowObj
-                    console.log(readonlyProxy.count++)
-                    // setTimeout(() => {
-                    //     refShallow.value.child.title = '再次改变'
-                    // }, 2000)
-                }, 2000)
-            })
+            const reactiveObj = reactive(rawObject)
+            const readonlyReactive = readonly(reactiveObj)
+            console.log(readonlyReactive.child)
+            // console.log(readonlyReactive)
+            // watchEffect(() => {
+            //     console.log(readonlyReactive.count)
+            //     // console.log(readonlyProxy.child.title)
+            // })
+            // onMounted(() => {
+            //     setTimeout(() => {
+            //         readonlyReactive.count++
+            //     }, 2000)
+            // })
             return {
-                readonlyProxy,
+                // readonlyProxy,
                 // readonlyReactive
             }
         }
