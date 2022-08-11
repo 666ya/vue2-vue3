@@ -38,7 +38,8 @@
             const reactiveRrrayIncludes = reactive([
                 rawObj, 1
             ])
-            // console.log(reactiveObj === reactiveRrrayIncludes[0])
+            // readonly get
+
             watchEffect(() => {
                 console.log(rawObj.count)
             })
