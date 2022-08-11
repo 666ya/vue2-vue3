@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{reactiveRrrayIncludes[0] === reactiveObj }}
+        {{reactiveRrrayIncludes.includes(rawObj) }}
+        <!-- {{reactiveRrrayIncludes.includes(reactiveObj) }}
+        {{ rawObj1.count }}
+        {{ reactiveObj.count }} -->
+        <!-- {{ reactiveArray[0] }} -->
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { reactive, onMounted, isReactive, watchEffect } = Vue
+    var appOptions = {
+        setup() {
+            // Array
+            const array = [0, 1]
+            let reactiveArray = reactive(array)
+            // Array includes
+            const rawObj = {
+                count: 1,
+                child: {
+                    title: 'rawObject'
+                }
+            }
+            const rawObj1 = rawObj
+            const reactiveObj = reactive(rawObj)
+            const reactiveRrrayIncludes = reactive([
+                rawObj, 1
+            ])
+            // console.log(reactiveObj === reactiveRrrayIncludes[0])
+            watchEffect(() => {
+                console.log(rawObj.count)
+            })
+            onMounted(() => {
+                setTimeout(() => {
+                    reactiveObj.count = 2
+                    // reactiveObj.count = 1
+                    // rawObj.count = 2
+                    // console.log(rawObj)
+                }, 2000)
+            })
+            return {
+                reactiveArray,
+                reactiveRrrayIncludes,
+                rawObj,
+                reactiveObj,
+                rawObj1
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
