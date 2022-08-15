@@ -36,16 +36,18 @@
             const reactiveObj = reactive(rawObj)
             effect(() => {
                 console.log(reactiveObj.count)
-                console.log(reactiveObj.name)
-                // effect(() => {
-                //     console.log(reactiveObj.name)
-                // })
+                // console.log(reactiveObj.name)
+                effect(() => {
+                    console.log(reactiveObj.name)
+                })
             })
             onMounted(() => {
                 setTimeout(() => {
-                    reactiveObj.name = 'a'
+                    reactiveObj.count = 2
+                    reactiveObj.name = 'aa'
                 }, 2000)
             })
+
             return {
                 reactiveObj
             }
