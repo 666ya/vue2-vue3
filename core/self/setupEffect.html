@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- {{ reactiveObj.child }} -->
+        <!-- {{reactiveRrrayIncludes[0] === reactiveObj }}
+        {{reactiveRrrayIncludes.includes(rawObj) }} -->
+        <!-- {{reactiveRrrayIncludes.includes(reactiveObj) }}
+        {{ rawObj1.count }}
+        {{ reactiveObj.count }} -->
+        <!-- {{ reactiveArray[0] }} -->
+    </div>
+</body>
+<!-- <script src="./effect.js"></script> -->
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { reactive, onMounted, isReactive, watchEffect, effect } = Vue
+    var appOptions = {
+        setup() {
+            const rawObj = {
+                count: 1,
+                child: {
+                    title: 'rawObject'
+                },
+                name: 'name'
+            }
+            const rawObj1 = rawObj
+            const reactiveObj = reactive(rawObj)
+            effect(() => {
+                console.log(reactiveObj.count)
+                console.log(reactiveObj.name)
+                // effect(() => {
+                //     console.log(reactiveObj.name)
+                // })
+            })
+            onMounted(() => {
+                setTimeout(() => {
+                    reactiveObj.name = 'a'
+                }, 2000)
+            })
+            return {
+                reactiveObj
+            }
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>

@@ -10,7 +10,7 @@
 
 <body>
     <div id="app">
-        {{ reactiveObj.child }}
+        <!-- {{ reactiveObj.child }} -->
         <!-- {{reactiveRrrayIncludes[0] === reactiveObj }}
         {{reactiveRrrayIncludes.includes(rawObj) }} -->
         <!-- {{reactiveRrrayIncludes.includes(reactiveObj) }}
@@ -19,30 +19,46 @@
         <!-- {{ reactiveArray[0] }} -->
     </div>
 </body>
-<script src="./effect.js"></script>
+<!-- <script src="./effect.js"></script> -->
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { reactive, onMounted, isReactive, watchEffect } = Vue
-    var appOptions = {
-        setup() {
-            const rawObj = {
-                count: 1,
-                child: {
-                    title: 'rawObject'
-                }
-            }
-            const rawObj1 = rawObj
-            const reactiveObj = reactive(rawObj)
-            // onMounted(() => {
-
-            // })
-            return {
-                reactiveObj
-            }
+    const { reactive, onMounted, isReactive, watchEffect, effect } = Vue
+    const rawObj = {
+        count: 1,
+        child: {
+            title: 'rawObject'
         }
     }
-    var app = Vue.createApp(appOptions)
-    app.mount('#app')
+
+    const rawObj1 = rawObj
+    const reactiveObj = reactive(rawObj)
+    effect(() => {
+        console.log(reactiveObj.count)
+    })
+        // return {
+        //     reactiveObj
+        // }
+    // var appOptions = {
+    //     setup() {
+    //         const rawObj = {
+    //             count: 1,
+    //             child: {
+    //                 title: 'rawObject'
+    //             }
+    //         }
+
+    //         const rawObj1 = rawObj
+    //         const reactiveObj = reactive(rawObj)
+    //         effect(() => {
+    //             console.log(reactiveObj.count)
+    //         })
+    //         return {
+    //             reactiveObj
+    //         }
+    //     }
+    // }
+    // var app = Vue.createApp(appOptions)
+    // app.mount('#app')
 </script>
 
 </html>
