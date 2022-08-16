@@ -10,6 +10,8 @@
 
 <body>
     <div id="app">
+        <!-- <div v-if="show">aa</div>
+        <div v-else>bb</div> -->
         <!-- {{ reactiveObj.child }} -->
         <!-- {{reactiveRrrayIncludes[0] === reactiveObj }}
         {{reactiveRrrayIncludes.includes(rawObj) }} -->
@@ -22,8 +24,13 @@
 <!-- <script src="./effect.js"></script> -->
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { reactive, onMounted, isReactive, watchEffect, effect } = Vue
+    const { reactive, onMounted, isReactive, watchEffect, effect, ref } = Vue
     var appOptions = {
+        data() {
+            return {
+                show: false
+            }
+        },
         setup() {
             const rawObj = {
                 count: 1,
@@ -36,22 +43,41 @@
             const reactiveObj = reactive(rawObj)
             effect(() => {
                 console.log(reactiveObj.count)
+                // console.log(reactiveObj.count)
                 // console.log(reactiveObj.name)
-                effect(() => {
-                    console.log(reactiveObj.name)
-                })
+                // effect(() => {
+                //     console.log(reactiveObj.name)
+                // })
+            })
+            effect(() => {
+                console.log(reactiveObj.name)
+                // console.log(reactiveObj.count)
+                // console.log(reactiveObj.name)
+                // effect(() => {
+                //     console.log(reactiveObj.name)
+                // })
             })
             onMounted(() => {
                 setTimeout(() => {
-                    reactiveObj.count = 2
-                    reactiveObj.name = 'aa'
-                }, 2000)
+                    show.value = true
+                    // reactiveObj.count = 2
+                    // reactiveObj.name = 'aa'
+                }, 5000)
             })
 
             return {
                 reactiveObj
             }
-        }
+        },
+        // mounted() {
+        //     setTimeout(() => {
+        //         this.show = false
+        //     }, 7000)
+        //     setTimeout(() => {
+        //         this.show = true
+        //         // this.name = 'bb'
+        //     }, 5000)
+        // },
     }
     var app = Vue.createApp(appOptions)
     app.mount('#app')
