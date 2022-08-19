@@ -10,6 +10,7 @@
 
 <body>
     <div id="app">
+        <!-- {{ 'aaa' }} -->
         <!-- <div v-if="show">aa</div>
         <div v-else>bb</div> -->
         <!-- {{ reactiveObj.child }} -->
@@ -24,7 +25,53 @@
 <!-- <script src="./effect.js"></script> -->
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { reactive, onMounted, isReactive, watchEffect, effect, ref } = Vue
+    const { reactive, onMounted, isReactive, watchEffect, effect, ref, stop } = Vue
+    const rawObj = {
+        show: false,
+        count: 1000,
+        child: {
+            title: 'rawObject'
+        },
+        name: 'name'
+    }
+    const rawObj1 = rawObj
+    const reactiveObj = reactive(rawObj)
+    // console.log(array)
+    // let ptr = 0
+    // for (let i = 0; i < 10; i++) {
+    //     array[++ptr] = i
+    // }
+    // console.log(array)
+    effect(() => {
+        if (reactiveObj.show) {
+            console.log(reactiveObj.count)
+        } else {
+            console.log(reactiveObj.name)
+        }
+        // effect(() => {
+        //     reactiveObj.count = 10001
+        // })
+
+    })
+    // effect(runner)
+    // const fn = function functionName() {
+    //     console.log(reactiveObj.count)
+    //     // effect((fn))
+
+    // }
+    // let runner = effect(() => {
+    //     console.log(reactiveObj.count)
+    // })
+    setTimeout(() => {
+        reactiveObj.show = true
+    }, 2000)
+    // setTimeout(() => {
+    //     reactiveObj.name = '修改name'
+    // }, 3000)
+
+
+
+
     var appOptions = {
         data() {
             return {
@@ -33,7 +80,7 @@
         },
         setup() {
             const rawObj = {
-                count: 1,
+                count: 1000,
                 child: {
                     title: 'rawObject'
                 },
@@ -41,46 +88,48 @@
             }
             const rawObj1 = rawObj
             const reactiveObj = reactive(rawObj)
-            effect(() => {
+            const runner = effect(() => {
                 console.log(reactiveObj.count)
-                // console.log(reactiveObj.count)
-                // console.log(reactiveObj.name)
-                // effect(() => {
-                //     console.log(reactiveObj.name)
-                // })
-            })
-            effect(() => {
-                console.log(reactiveObj.name)
-                // console.log(reactiveObj.count)
-                // console.log(reactiveObj.name)
-                // effect(() => {
-                //     console.log(reactiveObj.name)
-                // })
-            })
-            onMounted(() => {
-                setTimeout(() => {
-                    show.value = true
-                    // reactiveObj.count = 2
-                    // reactiveObj.name = 'aa'
-                }, 5000)
+                effect(() => {
+                    console.log(reactiveObj.name)
+                })
+            }, {
+                allowRecurse: false
             })
 
+            // stop(runner)
+            // runner()
+            // console.log(runner.effect)
+            // let count = 0
+            // function f() {
+            //     if (count === 33) {
+            //         effect(() => {
+            //             console.log(reactiveObj.count)
+            //         })
+            //         return
+            //     }
+            //     effect(() => {
+            //         count++
+            //         console.log('count:' + count)
+            //         f()
+            //     })
+            // }
+            // f()
+            onMounted(() => {
+                setTimeout(() => {
+                    reactiveObj.count = 10001
+                }, 2000)
+                setTimeout(() => {
+                    reactiveObj.name = '修改name'
+                }, 3000)
+            })
             return {
                 reactiveObj
             }
         },
-        // mounted() {
-        //     setTimeout(() => {
-        //         this.show = false
-        //     }, 7000)
-        //     setTimeout(() => {
-        //         this.show = true
-        //         // this.name = 'bb'
-        //     }, 5000)
-        // },
     }
-    var app = Vue.createApp(appOptions)
-    app.mount('#app')
+    // var app = Vue.createApp(appOptions)
+    // app.mount('#app')
 </script>
 
 </html>
