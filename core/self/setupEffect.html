@@ -9,18 +9,7 @@
 </head>
 
 <body>
-    <div id="app">
-        <!-- {{ 'aaa' }} -->
-        <!-- <div v-if="show">aa</div>
-        <div v-else>bb</div> -->
-        <!-- {{ reactiveObj.child }} -->
-        <!-- {{reactiveRrrayIncludes[0] === reactiveObj }}
-        {{reactiveRrrayIncludes.includes(rawObj) }} -->
-        <!-- {{reactiveRrrayIncludes.includes(reactiveObj) }}
-        {{ rawObj1.count }}
-        {{ reactiveObj.count }} -->
-        <!-- {{ reactiveArray[0] }} -->
-    </div>
+    <div id="app"> </div>
 </body>
 <!-- <script src="./effect.js"></script> -->
 <script src="../../dist/vue.global.js"></script>
@@ -32,104 +21,28 @@
         child: {
             title: 'rawObject'
         },
-        name: 'name'
+        name: 'name',
+        title: 'test'
     }
     const rawObj1 = rawObj
     const reactiveObj = reactive(rawObj)
-    // console.log(array)
-    // let ptr = 0
-    // for (let i = 0; i < 10; i++) {
-    //     array[++ptr] = i
-    // }
-    // console.log(array)
-    effect(() => {
-        if (reactiveObj.show) {
-            console.log(reactiveObj.count)
-        } else {
-            console.log(reactiveObj.name)
-        }
-        // effect(() => {
-        //     reactiveObj.count = 10001
-        // })
-
-    })
-    // effect(runner)
-    // const fn = function functionName() {
-    //     console.log(reactiveObj.count)
-    //     // effect((fn))
-
-    // }
-    // let runner = effect(() => {
-    //     console.log(reactiveObj.count)
+    // const runner = effect(() => {
+    //     if (reactiveObj.show) {
+    //         console.log(reactiveObj.count)
+    //     } else {
+    //         console.log(reactiveObj.name)
+    //     }
+    // }, {
+    //     onStop: () => {
+    //         console.log('stop')
+    //     }
     // })
-    setTimeout(() => {
-        reactiveObj.show = true
-    }, 2000)
-    // setTimeout(() => {
-    //     reactiveObj.name = '修改name'
-    // }, 3000)
+    // console.log(runner)
+    // runner.effect.stop()
 
-
-
-
-    var appOptions = {
-        data() {
-            return {
-                show: false
-            }
-        },
-        setup() {
-            const rawObj = {
-                count: 1000,
-                child: {
-                    title: 'rawObject'
-                },
-                name: 'name'
-            }
-            const rawObj1 = rawObj
-            const reactiveObj = reactive(rawObj)
-            const runner = effect(() => {
-                console.log(reactiveObj.count)
-                effect(() => {
-                    console.log(reactiveObj.name)
-                })
-            }, {
-                allowRecurse: false
-            })
-
-            // stop(runner)
-            // runner()
-            // console.log(runner.effect)
-            // let count = 0
-            // function f() {
-            //     if (count === 33) {
-            //         effect(() => {
-            //             console.log(reactiveObj.count)
-            //         })
-            //         return
-            //     }
-            //     effect(() => {
-            //         count++
-            //         console.log('count:' + count)
-            //         f()
-            //     })
-            // }
-            // f()
-            onMounted(() => {
-                setTimeout(() => {
-                    reactiveObj.count = 10001
-                }, 2000)
-                setTimeout(() => {
-                    reactiveObj.name = '修改name'
-                }, 3000)
-            })
-            return {
-                reactiveObj
-            }
-        },
-    }
-    // var app = Vue.createApp(appOptions)
-    // app.mount('#app')
+    stop(() => {
+        console.log('aa')
+    })
 </script>
 
 </html>
