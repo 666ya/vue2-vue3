@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body></body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { shallowRef, effect, reactive } = Vue
+    const rawObject = {
+        name: 'rawObject',
+        count: 1
+    }
+    const rrObject = shallowRef(rawObject)
+    effect(() => {
+        console.log(rrObject.value)
+    })
+    setTimeout(() => {
+        rrObject.value = reactive(rawObject)
+    }, 2000)
+</script>
+
+</html>

@@ -26,43 +26,12 @@
         name: '1',
         key: "2"
     }
-
-    /**
-     *  effect函数
-     */
-    // 对象
-    // const rawObj = {
-    //     show: false,
-    //     count: 1000,
-    //     child: {
-    //         title: 'rawObject'
-    //     },
-    //     name: 'name',
-    //     title: 'test'
-    // }
-    // let reactiveObj = reactive(rawObj)
-    // let count = 0
-    // const runner = effect(() => {
-    //     console.log(reactiveObj)
-    //     count++
-    //     console.log('进入effect次数：' + count)
-    //     // console.log(reactiveObj)
-    //     if (reactiveObj.show) {
-    //         console.log(reactiveObj.count)
-    //     } else {
-    //         console.log(reactiveObj.name)
-    //     }
-    // })
-    // 数组
+    // 数组add
     const rawArray = [1]
     let reactiveArray = reactive(rawArray)
     effect(() => {
-        console.log(reactiveArray.length)
-        // console.log(reactiveArray[1])
-        // console.log(reactiveArray[2])
-        // console.log('进入')
-        // console.log(reactiveArray.includes(1))
-        // console.log(reactiveArray[1])
+        // console.log(reactiveArray.length)
+        console.log(reactiveArray[0])
     }, {
         onTrigger(event) {
             console.log(event)
@@ -78,15 +47,15 @@
     //     // console.log(reactiveArray.includes(1))
     //     // console.log(reactiveArray[1])
     // })
-    setTimeout(() => {
-        // reactiveArray.delete('2')
-        // delete reactiveArray['2']
-        // console.log(reactiveArray)
-        // console.log(rawArray)
-        // reactiveArray.shift()
-        reactiveArray[1] = 2
-        // reactiveArray.length = 3
-    }, 5000)
+    // setTimeout(() => {
+    //     // reactiveArray.delete('2')
+    //     // delete reactiveArray['2']
+    //     // console.log(reactiveArray)
+    //     // console.log(rawArray)
+    //     // reactiveArray.shift()
+    //     reactiveArray[1] = 2
+    //     // reactiveArray.length = 3
+    // }, 5000)
     /**
      *  Vue
      */

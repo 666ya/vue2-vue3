@@ -8,59 +8,30 @@
     <title>Document</title>
 </head>
 
-<body>
-    <div id="app">
-        {{refReadonly.child.title }}
-        {{refReadonly.count }}
-    </div>
-</body>
+<body></body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { isProxy, shallowRef, ref, isReactive, reactive, isRef, watchEffect, toRaw, onMounted, readonly, shallowReactive, watchPostEffect } = Vue
-    var appOptions = {
-        setup() {
-            const rawObject = {
-                count: 1,
-                child: {
-                    title: 'rawObject'
-                }
-            }
-            // rr
-            const rr = ref(rawObject)
-            // ref(reactive)
-            const reactiveObj = reactive(rawObject)
-            const refReactive = ref(reactiveObj)
-            // ref(readonly)
-            const readonlyObj = readonly(rawObject)
-            const refReadonly = ref(readonlyObj)
-            // ref(shallow)
-            const shallowObj = shallowReactive(rawObject)
-            const refShallow = ref(shallowObj)
-            console.log(refShallow)
-            watchEffect(() => {
-                console.log(refShallow.value.count)
-                console.log(refShallow.value.child.title)
-            })
-            onMounted(() => {
-                setTimeout(() => {
-                    // refReadonly.value.count++
-                    // refShallow.value = shallowObj
-                    refShallow.value.child.title = '再次改变'
-                    // setTimeout(() => {
-                    //     refShallow.value.child.title = '再次改变'
-                    // }, 2000)
-                }, 2000)
-            })
-            return {
-                rr,
-                refReactive,
-                refReadonly,
-                refShallow
-            }
-        }
+    const { ref, effect, reactive, shallowRef } = Vue
+    const rawObject = {
+        name: 'rawObject',
+        count: 1
     }
-    var app = Vue.createApp(appOptions)
-    app.mount('#app')
+    // const rrObject = ref(rawObject)
+    // effect(() => {
+    //     console.log(rrObject.value)
+    // })
+    const rrObject = shallowRef(rawObject)
+    const rrObject1 = shallowRef(reactive(rawObject))
+    console.log(rrObject.value)
+    console.log(rrObject1.value)
+    console.log(rrObject.value === rrObject1.value)
+    // effect(() => {
+    //     console.log(rrObject.value)
+    // })
+    // setTimeout(() => {
+    //     console.log('手动改变值看是否触发trigger')
+    //     rrObject.value = shallowReactive(rawObject)
+    // }, 2000)
 </script>
 
 </html>
