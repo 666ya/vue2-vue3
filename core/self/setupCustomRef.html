@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{ refsObject.count }}
+        {{ proxyRefsRet.count }}
+        {{ reactiveObj.count }}
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { customRef, effect, reactive, triggerRef, toRef, onMounted, defineProps, ref, toRefs, proxyRefs } = Vue
+    console.log(Vue)
+    const obj = {
+        count: 0
+    }
+    // customRef
+    // const customFn = function (track, triggger) {
+    //     return {
+    //         get() {
+    //             track()
+    //             return obj.count
+    //         },
+    //         set(newVal) {
+    //             obj.count = newVal
+    //             triggger()
+    //         }
+    //     }
+    // }
+    // const customRef1 = customRef(customFn)
+    // console.log(customRef1)
+    // effect(() => {
+    //     console.log(customRef1.value)
+    // })
+    // setTimeout(() => {
+    //     customRef1.value = 2
+    // }, 2000)
+
+    // toRefs
+    // const rawObj = {
+    //     name: 'text',
+    //     count: 1
+    // }
+    // const reactiveObj = reactive(rawObj)
+    // const reactiveRet = toRefs(reactiveObj)
+    // const proxyRefsRet = proxyRefs(reactiveRet)
+    // console.log(reactiveRet.count.value === proxyRefsRet.count)
+    // effect(() => {
+    //     // console.log(reactiveObj.count)
+    //     console.log(proxyRefsRet.count)
+    // })
+    // setTimeout(() => {
+    //     reactiveRet.count.value++
+    // }, 2000)
+    var appOptions = {
+        setup() {
+            const rawObj = {
+                name: 'text',
+                count: 1
+            }
+            const reactiveObj = reactive(rawObj)
+            const refsObject = toRefs(reactiveObj)
+            const proxyRefsRet = proxyRefs(refsObject)
+            // let { count } = proxyRefsRet
+            // let { count } = refsObject
+            // let { count } = reactiveObj
+            // console.log(count)
+            // console.log(reactiveRet.count.value === proxyRefsRet.count)
+            onMounted(() => {
+                setTimeout(() => {
+                    proxyRefsRet.count = 2
+                    // count.value++
+                    // refsObject.count++
+                    // proxyRefsRet.count++
+                }, 2000)
+            })
+            return {
+                refsObject,
+                proxyRefsRet,
+                reactiveObj
+            }
+        }
+    }
+    const app = Vue.createApp(appOptions)
+    app.mount('#app')
+
+</script>
+
+</html>

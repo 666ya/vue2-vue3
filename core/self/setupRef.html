@@ -11,27 +11,15 @@
 <body></body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { ref, effect, reactive, shallowRef } = Vue
-    const rawObject = {
-        name: 'rawObject',
-        count: 1
-    }
-    // const rrObject = ref(rawObject)
-    // effect(() => {
-    //     console.log(rrObject.value)
-    // })
-    const rrObject = shallowRef(rawObject)
-    const rrObject1 = shallowRef(reactive(rawObject))
-    console.log(rrObject.value)
-    console.log(rrObject1.value)
-    console.log(rrObject.value === rrObject1.value)
-    // effect(() => {
-    //     console.log(rrObject.value)
-    // })
-    // setTimeout(() => {
-    //     console.log('手动改变值看是否触发trigger')
-    //     rrObject.value = shallowReactive(rawObject)
-    // }, 2000)
+    const { ref, effect, reactive, shallowRef, triggerRef } = Vue
+    const ref1 = ref({
+        name: 'object'
+    })
+    effect(() => {
+        console.log(ref1.value)
+    })
+    // ref1.value.name = '111'
+    triggerRef(ref1)
 </script>
 
 </html>
