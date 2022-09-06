@@ -11,17 +11,21 @@
 <body></body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { shallowRef, effect, reactive, triggerRef } = Vue
-    const shallRef1 = shallowRef({
+    const { ref, shallowRef, effect, reactive, triggerRef } = Vue
+    const shallRef1 = ref({
         name: 'rawObj'
     })
     effect(() => {
         // trackEffect   sahllRef1 => value => dep
         console.log(shallRef1.value.name)
     })
-    // shallRef1.value.name = '111'
+    setTimeout(() => {
+        shallRef1.value.name = '111'
+        console.log(shallRef1.value)
+    })
+
     // shallRef1.
-    triggerRef(shallRef1)
+    // triggerRef(shallRef1)
 </script>
 
 </html>

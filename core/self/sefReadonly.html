@@ -9,46 +9,17 @@
 </head>
 
 <body>
-    <div id="app">
-        <!-- {{readonlyReactive.child.title }}
-        {{readonlyReactive.count }} -->
-    </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { onMounted, readonly, watchEffect, reactive } = Vue
-    var appOptions = {
-        setup() {
-            const rawObject = {
-                count: 1,
-                child: {
-                    title: 'rawObject'
-                }
-            }
-            // reanonlyRaw
-            // const readonlyProxy = readonly(rawObject)
-            // readonly(reactive)
-            const reactiveObj = reactive(rawObject)
-            const readonlyReactive = readonly(reactiveObj)
-            console.log(readonlyReactive.child)
-            // console.log(readonlyReactive)
-            // watchEffect(() => {
-            //     console.log(readonlyReactive.count)
-            //     // console.log(readonlyProxy.child.title)
-            // })
-            // onMounted(() => {
-            //     setTimeout(() => {
-            //         readonlyReactive.count++
-            //     }, 2000)
-            // })
-            return {
-                // readonlyProxy,
-                // readonlyReactive
-            }
-        }
+    const { onMounted, shallowReactive, readonly, watchEffect, reactive, isReactive, isReadonly, isShallow } = Vue
+    const rawObj = {
+        count: 1
     }
-    var app = Vue.createApp(appOptions)
-    app.mount('#app')
+    const reactiveObject = shallowReactive(rawObj)
+    const readonlyObject = readonly(reactiveObject)
+    console.log(isShallow(reactiveObject))
+    console.log(isShallow(readonlyObject))
 </script>
 
 </html>
