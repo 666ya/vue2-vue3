@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body></body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { reactive, effect } = Vue
+    const rawObj = {
+        count: 1
+    }
+    const rawArray = [1, 2, 3, 4]
+    const reactiveObj = reactive(rawObj)
+    const reactiveArray = reactive(rawArray)
+    // has拦截 in
+    // effect(() => {
+    //     console.log('count' in reactiveObj)  // has拦截
+    // })
+    // setTimeout(() => {
+    //     // reactiveObj.count = 2 // 触发
+    //     // delete reactiveObj.count // 触发
+    //     // reactive.test = 2 // 不触发
+    // }, 2000)
+    // ownKeys拦截 length/itetate
+    effect(() => {
+        // console.log(Object.keys(reactiveObj)) // ownKeys拦截对象
+        console.log(Object.keys(reactiveArray)) // ownKeys拦截数据
+    })
+    setTimeout(() => {
+        // reactiveObj.count = 2 // 不触发itreate
+        // reactiveObj.test = 2   // 会触发itrate
+
+        reactiveArray[1] = 10 // 不会触发length
+        reactiveArray[4] = 5   // 新增会触发leng
+    }, 2000)
+</script>
+
+</html>
