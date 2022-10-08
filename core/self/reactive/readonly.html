@@ -18,16 +18,17 @@
         info: {
             name: 'test'
         },
-        value: ref(1)
+        refValue: ref({
+            count: 1
+        })
     }
-    const shallowObject = shallowReactive(rawObj)
     const reactiveObject = reactive(rawObj)
+    const readonlyObject = readonly(reactiveObject)
     effect(() => {
-        // console.log(shallowObject.info)
-        console.log(shallowObject.value)
-        console.log(reactiveObject.value)
+        console.log(readonlyObject.refValue)
     })
     setTimeout(() => {
+        readonlyObject.refValue.count.value = 3
         // delete shallowObject.info.name
         // delete shallowObject.info.name
         // console.log(shallowObject.info.name)

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+</body>
+<script src="../../../dist/vue.global.js"></script>
+<script>
+    const { ref, reactive, readonly, shallowReadonly, effect, isReactive, isReadonly } = Vue
+    const rawObj = {
+        count: 1,
+        info: {
+            name: 'test'
+        },
+        refValue: ref({
+            count: 1
+        })
+    }
+    const reactiveObject = reactive(rawObj)
+    const readonlyObject = readonly(rawObj)
+    const shallowReadonlyObject = shallowReadonly(readonlyObject)
+
+    // effect(() => {
+    //     console.log(shallowReadonlyObject.info)
+    //     console.log(isReactive(shallowReadonlyObject))
+    //     console.log(isReadonly(shallowReadonlyObject))
+    // })
+    // setTimeout(() => {
+    //     shallowReadonlyObject.info.name = '测试'
+    //     // delete shallowObject.info.name
+    //     // delete shallowObject.info.name
+    //     // console.log(shallowObject.info.name)
+    // }, 2000)
+</script>
+
+</html>

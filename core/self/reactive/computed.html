@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- <div id="app">
+        <p>{{ count }}<button @click="handleClick">切换</button></p>
+        <p>{{ value }}</p>
+    </div> -->
+</body>
+<script src="../../../dist/vue.global.js"></script>
+<script>
+    const { ref, reactive, onMounted, isReactive, watchEffect, readonly, shallowReactive, effect, computed, isRef, isReadonly } = Vue
+    const rawObj = {
+        count: 1,
+        info: {
+            name: 'test'
+        },
+        refValue: ref({
+            count: 1,
+
+        })
+    }
+    let obj = reactive({
+        isShow: true
+    })
+    let count = computed(() => {
+        return obj.isShow ? 1 : 0
+    })
+    // let count = computed({
+    //     get() {
+    //         return obj.isShow ? 1 : 0
+    //     },
+    //     // set(value) {
+    //     //     console.log(value)
+    //     //     return value
+    //     // }
+    // })
+    // console.log(isReadonly(count))
+    effect(() => {
+        console.log(count.value)
+    })
+    // setTimeout(() => {
+    //     // obj.isShow = !obj.isShow
+    //     count.value = 2
+    // }, 2000)
+    // const appOptions = {
+    //     data() {
+    //         return {
+    //             isShow: false,
+    //             value: 1
+    //         }
+    //     },
+    //     computed: {
+    //         count() {
+    //             return this.isShow ? 1 : 0
+    //         }
+    //     },
+    //     created() {
+    //         console.log(isRef(this.isShow))
+    //     },
+    //     methods: {
+    //         handleClick() {
+
+    //             // this.isShow = this.isShow
+    //             this.value++
+    //         }
+    //     },
+    // }
+    // const app = Vue.createApp(appOptions).mount('#app')
+</script>
+
+</html>
