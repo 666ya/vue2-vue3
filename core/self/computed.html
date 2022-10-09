@@ -9,10 +9,10 @@
 </head>
 
 <body>
-    <div id="app">
+    <!-- <div id="app">
         <p>{{ count }}<button @click="handleClick">切换</button></p>
         <p>{{ value }}</p>
-    </div>
+    </div> -->
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
@@ -27,40 +27,41 @@
 
         })
     }
-    // let obj = reactive({
-    //     isShow: true
-    // })
-    // let count = computed(() => {
-    //     return obj.isShow ? 1 : 0
-    // })
-    // effect(() => {
-    //     console.log(count.value)
-    // })
-    // setTimeout(() => {
-    //     obj.isShow = obj.isShow
-    //     // count.value = 2
-    // }, 2000)
-    const appOptions = {
-        data() {
-            return {
-                isShow: false,
-                value: 1
-            }
-        },
-        computed: {
-            count() {
-                return 2
-            }
-        },
-        methods: {
-            handleClick() {
+    let obj = reactive({
+        isShow: true
+    })
+    let count = computed(() => {
+        return obj.isShow ? 1 : 0
+    })
+    effect(() => {
+        console.log(count.value)
+        obj.isShow = !obj.isShow
+    })
+    setTimeout(() => {
+        obj.isShow = !obj.isShow
+        // count.value = 2
+    }, 2000)
+    // const appOptions = {
+    //     data() {
+    //         return {
+    //             isShow: false,
+    //             value: 1
+    //         }
+    //     },
+    //     computed: {
+    //         count() {
+    //             return 2
+    //         }
+    //     },
+    //     methods: {
+    //         handleClick() {
 
-                // this.isShow = this.isShow
-                this.value++
-            }
-        },
-    }
-    const app = Vue.createApp(appOptions).mount('#app')
+    //             // this.isShow = this.isShow
+    //             this.value++
+    //         }
+    //     },
+    // }
+    // const app = Vue.createApp(appOptions).mount('#app')
 </script>
 
 </html>
