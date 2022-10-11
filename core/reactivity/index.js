@@ -19,8 +19,14 @@ function trigger(target, key) {
     const depsMap = bucket.get(target)
     if (!depsMap) return
     const effects = depsMap.get(key)
+    // const effectToRun = new Set()
+    // effects && effects.forEach(effectFn => {
+    //     if (effectFn !== activeEffect) {
+    //         effectToRun.add(effectFn)
+    //     }
+    // })
     const effectToRun = new Set(effects)
-    effectToRun && effectToRun.forEach(fn => fn())
+    effectToRun && effectToRun.forEach(effectFn => effectFn())
 }
 // 注册副作用
 function effect(fn) {
@@ -48,7 +54,8 @@ const rawObj = {
     text: 'text',
     show: true,
     foo: true,
-    bar: true
+    bar: true,
+    count: 1
 }
 const obj = new Proxy(rawObj, {
     get(target, key) {
@@ -60,25 +67,29 @@ const obj = new Proxy(rawObj, {
         trigger(target, key)
     }
 })
-let temp1, temp2
-effect(function effect1() {
-    console.log('function effect1')
-    effect(function effect2() {
-        console.log('function effect2')
-        temp2 = obj.bar
-    })
-
-    temp1 = obj.foo
-})
-
-
+// 无线循环
 effect(() => {
-    console.log('app effect')
-    document.querySelector('#app').textContent = obj.text
+    obj.count++
 })
+// let temp1, temp2
+// effect(function effect1() {
+//     console.log('function effect1')
+//     effect(function effect2() {
+//         console.log('function effect2')
+//         temp2 = obj.bar
+//     })
 
-setTimeout(() => {
-    obj.foo = false
-}, 2000)
+//     temp1 = obj.foo
+// })
+
+
+// effect(() => {
+//     console.log('app effect')
+//     document.querySelector('#app').textContent = obj.text
+// })
+
+// setTimeout(() => {
+//     obj.foo = false
+// }, 2000)
 
 // obj.text = '修改'
