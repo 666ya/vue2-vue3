@@ -1,5 +1,7 @@
 let activeEffect
 const bucket = new WeakMap()
+const ITERATE_KEY = Symbol()
+const effectStack = []
 // 定义一个任务队列
 const jobQueue = new Set()
 const p = Promise.resolve()
@@ -29,11 +31,25 @@ function track(target, key) {
     activeEffect.deps.push(deps)
 }
 
-function trigger(target, key) {
+function trigger(target, key, type, newVal) {
     const depsMap = bucket.get(target)
     if (!depsMap) return
     const effects = depsMap.get(key)
-    const effectToRun = new Set(effects)
+
+    const effectToRun = new Set()
+    effects && effects.forEach(effectFn => {
+        if (effectFn !== activeEffect) {
+            effectToRun.add(effectFn)
+        }
+    })
+    if (type === 'ADD' || type === 'DELETE') {
+        const iterateEffects = depsMap.get(ITERATE_KEY)
+        iterateEffects && iterateEffects.forEach(effectFn => {
+            if (effectFn !== activeEffect) {
+                effectToRun.add(effectFn)
+            }
+        })
+    }
     effectToRun && effectToRun.forEach(effectFn => {
         if (effectFn.options.scheduler) {
             effectFn.options.scheduler(effectFn)
@@ -42,22 +58,23 @@ function trigger(target, key) {
         }
     })
 }
+
+function cleanup(effectFn) {
+    for (let i = 0; i < effectFn.deps.length; i++) {
+        const dep = effectFn.deps[i]
+        dep.delete(effectFn)
+    }
+    effectFn.deps.length = 0
+}
 // 注册副作用
 function effect(fn, options = {}) {
     const effectFn = () => {
-        for (let i = 0; i < effectFn.deps.length; i++) {
-            const dep = effectFn.deps[i]
-            dep.delete(effectFn)
-        }
-        effectFn.deps.length = 0
-        if (activeEffect) {
-            effectFn.parent = activeEffect
-            activeEffect = effectFn
-        } else {
-            activeEffect = effectFn
-        }
+        cleanup(effectFn)
+        activeEffect = effectFn
+        effectStack.push(effectFn)
         const res = fn()
-        activeEffect = effectFn.parent
+        effectStack.pop()
+        activeEffect = effectStack[effectStack.length - 1]
         return res
     }
     effectFn.options = options
@@ -136,31 +153,6 @@ function watch(source, cb, options = {}) {
 
 }
 
-// handler
-var baseHandler = {
-    get(target, key, receiver) {
-        if (key === 'raw') {
-            return target
-        }
-        track(target, key)
-        const res = Reflect.get(target, key, receiver)
-        if (typeof res === 'object' && res !== null) {
-            return reactive(res)
-        }
-        return res
-    },
-    set(target, key, newValue, recevier) {
-        const oldValue = target[key]
-        const res = Reflect.set(target, key, newValue, recevier)
-        if (target === recevier.raw) {
-            if (oldValue !== newValue && (oldValue === oldValue || newValue === newValue)) {
-                trigger(target, key)
-            }
-            return res
-        }
-
-    }
-}
 
 function createReactive(obj, isShallow = false, isReadonly = false) {
     return new Proxy(obj, {
@@ -186,15 +178,33 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
                 return true
             }
             const oldValue = target[key]
+            const type = Array.isArray(target) ? Number(key) < target.length ? 'SET' : 'ADD' :
+                Object.prototype.hasOwnProperty.call(key) ? 'SET' : 'ADD'
             const res = Reflect.set(target, key, newValue, recevier)
             if (target === recevier.raw) {
                 if (oldValue !== newValue && (oldValue === oldValue || newValue === newValue)) {
-                    trigger(target, key)
+                    trigger(target, key, type, newValue)
                 }
                 return res
             }
 
-        }
+        },
+        has(target, key) {
+            track(target, key)
+            return Reflect.has(target, key)
+        },
+        deleteProperty(target, key) {
+            const hadKey = Object.prototype.hasOwnProperty.call(target, key)
+            const res = Reflect.deleteProperty(target, key)
+            if (res && hadKey) {
+                trigger(target, key, 'DELETE')
+            }
+            return res
+        },
+        ownKeys(target) {
+            track(target, Array.isArray(target) ? 'length' : ITERATE_KEY)
+            return Reflect.ownKeys(target)
+        },
     })
 }
 
