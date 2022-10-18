@@ -35,15 +35,45 @@ const shallowReadonlyObj = shallowReadonly({
 //     }
 // })
 // in 
-effect(() => {
-    console.log('count' in reactiveObj)
-})
-// for..in
-effect(() => {
-    for (const key in reactiveObj) {
-        console.log(key)
-    }
-})
-setTimeout(() => {
-    delete reactiveObj.count
-}, 2000)
+//effect(() => {
+//    console.log('count' in reactiveObj)
+//})
+//// for..in
+//effect(() => {
+//    for (const key in reactiveObj) {
+//        console.log(key)
+//    }
+//})
+//setTimeout(() => {
+//    delete reactiveObj.count
+//}, 2000)
+
+
+// 可调度性
+//effect(() => {
+//    console.log('effect1' + ' '+ reactiveObj.count)
+//}, {
+//    scheduler(fn) {
+//        jobQueue.add(fn)
+//        flushJob()
+//    }
+//})
+//effect(() => {
+//    console.log('effect2' + ' '+reactiveObj.foo.bar)
+//}, {
+//    scheduler(fn) {
+//        jobQueue.add(fn)
+//        flushJob()
+//    }
+//})
+//
+//setTimeout(() => {
+//    reactiveObj.count++
+//    reactiveObj.foo.bar++
+//    reactiveObj.count++
+//    reactiveObj.foo.bar++
+//},2000)
+
+
+
+

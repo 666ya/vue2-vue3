@@ -22,7 +22,7 @@ const count = computed(() => obj.foo + obj.bar)
 effect(() => {
     console.log(count.value)
 })
-
+console.log(count.value)
 
 setTimeout(() => {
     obj.foo++
