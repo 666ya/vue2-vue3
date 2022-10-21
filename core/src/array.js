@@ -1,10 +1,13 @@
-const arr = reactive(['foo'])
+const arr = reactive([])
 effect(() => {
-    console.log(arr[0])
+    arr.push(1)
+})
+effect(() => {
+    arr.push(2)
 })
 
 setTimeout(() => {
-    arr[0] = 'bar'
+    console.log(arr)
 }, 2000)
 
 // arr[1] = 'bar'
