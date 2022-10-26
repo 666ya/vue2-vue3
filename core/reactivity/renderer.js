@@ -20,6 +20,11 @@
           } else if (Array.isArray(n2.children)) {
               if (Array.isArray(n1.children)) {
                   // diff算法
+                  const oldChildren = n1.children
+                  const newChildren = n2.children
+                  for (let i = 0; i < oldChildren.length; i++) {
+                      patch(oldChildren[i], newChildren[i])
+                  }
               } else {
                   setElementText(container, '')
                   n2.children.forEach(c => patchChildren(null, c, container))
@@ -40,7 +45,7 @@
               setElementText(el, vnode.children)
           } else if (Array.isArray(vnode.children)) {
               vnode.children.forEach(child => {
-                  path(null, child, el)
+                  patch(null, child, el)
               })
           }
           if (vnode.props) {
@@ -70,7 +75,7 @@
           patchChildren(n1, n2, el)
       }
 
-      function path(n1, n2, container) {
+      function patch(n1, n2, container) {
           if (n1 && n1.type !== n2.type) {
               umount(n1)
               n1 = null
@@ -102,7 +107,7 @@
 
       function render(vnode, container) {
           if (vnode) {
-              path(container._vnode, vnode, container)
+              patch(container._vnode, vnode, container)
           } else {
               if (container._vnode) {
                   umount(container._vnode)

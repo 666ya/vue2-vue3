@@ -41,7 +41,6 @@ const renderer = createRenderer({
         } else if (key === 'class') {
             el.classNamee = nextValue || ''
         } else if (shouldSetAsProps(el, key, nextValue)) {
-            console.log(el)
             const type = typeof el[key]
             if (type === 'boolean' && nextValue === '') {
                 el[key] = true
@@ -61,35 +60,52 @@ const newVnode = {
 }
 const Comment = Symbol()
 effect(() => {
-    const vnode = {
-        type: 'input',
-        props: {
-            disabled: false
-        }
-    }
     // const vnode = {
-    //     type: 'div',
-    //     props: bol.value ? {
-    //         id: 'foo',
-    //         onClick: [
-    //             () => {
-    //                 alert('父元素click')
-    //             }
-    //         ],
-    //     } : {},
-    //     children: bol.value ? [{
-    //         type: 'p',
-    //         props: {
-    //             onClick: () => {
-    //                 bol.value = false
-    //             }
-    //         },
-    //         children: 'text'
-    //     }] : 'hello world'
+    //     type: 'input',
+    //     props: {
+    //         disabled: false,
+    //         form: 'form1'
+    //     }
     // }
+    const vnode = {
+        type: 'div',
+        props: bol.value ? {
+            id: 'foo',
+            onClick: [
+                () => {
+                    bol.value = true
+                }
+            ],
+        } : {},
+        children: bol.value ? [{
+                type: 'p',
+                children: '1'
+            },
+            {
+                type: 'p',
+                children: '2'
+            },
+            {
+                type: 'p',
+                children: '3'
+            }
+        ] : [{
+                type: 'p',
+                children: '4'
+            },
+            {
+                type: 'p',
+                children: '5'
+            },
+            {
+                type: 'p',
+                children: '6'
+            }
+        ]
+    }
     renderer.render(vnode, document.getElementById('app'))
 })
 
-// setTimeout(() => {
-//     count.value++
-// }, 2000)
+setTimeout(() => {
+    bol.value = false
+}, 2000)
