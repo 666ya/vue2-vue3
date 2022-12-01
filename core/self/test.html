@@ -9,8 +9,35 @@
 </head>
 
 <body>
-
+    <div id="app"></div>
 </body>
-<script src="./effect.js"></script>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { h, onMounted } = Vue
+    const appOptions = {
+        data() {
+            return {
+                count: 0
+            }
+        },
+        mounted() {
+            console.log(this.count)
+        },
+        setup() {
+            onMounted(() => {
+                console.log('onMounted')
+            })
+            return () => {
+                return h('div', 'setup')
+            }
+        },
+        // render() {
+        //     return h('div', 'render')
+        // },
+        // template: `<div>template{{ count }}</div>`
+    }
+    const app = Vue.createApp(appOptions)
+    app.mount(document.getElementById('app'))
+</script>
 
 </html>

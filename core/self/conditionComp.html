@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const container = {
+        props: {
+            show: Boolean
+        },
+        template: '<slot v-if="show"></slot>'
+    }
+    // const { ref } = Vue
+    var appOptions = {
+        components: {
+            container
+        },
+        data() {
+            return {
+                isShow: true
+            }
+        },
+        methods: {
+            handleChange() {
+                this.isShow = !this.isShow
+            }
+        },
+        // setup() {
+        //     const isShow = ref(true)
+        //     function handleChange() {
+        //         isShow.value = !isShow.value
+        //     }
+        //     return {
+        //         isShow,
+        //         handleChange
+        //     }
+        // },
+        // template: `<div><p v-if="isShow">姓名：<input name="name"/></p><p v-else>email：</button><input name="email" /></p><button @click="handleChange">切换</button></button></div>`
+        template: `<button @click="handleChange">切换</button><container :show="!isShow"><div v-show="isShow">provied Content</div></container>`
+    }
+
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+    // appOptions.el = '#app'
+    // var app = new Vue(appOptions)
+</script>
+
+</html>
