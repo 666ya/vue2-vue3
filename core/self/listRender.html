@@ -27,7 +27,7 @@
         // },
         data() {
             return {
-                isShow: true
+                list: [1, 2, 3, 4]
             }
         },
         methods: {
@@ -35,20 +35,7 @@
                 this.isShow = !this.isShow
             }
         },
-        template: '<div v-show="isShow">bb</div>'
-        // template: '<container :show="isShow"></container>'
-        // setup() {
-        //     const isShow = ref(true)
-        //     function handleChange() {
-        //         isShow.value = !isShow.value
-        //     }
-        //     return {
-        //         isShow,
-        //         handleChange
-        //     }
-        // },
-        // template: `<div><p v-if="isShow" key="1">姓名：<input  name="name"/></p><p v-else key="2">email：<input  name="email" /></p><button @click="handleChange">切换</button></div>`
-        // template: `<button @click="handleChange">切换</button><container :show="!isShow"><div v-show="isShow">provied Content</div></container>`
+        template: `<div><p v-for="item in list" :name="item" :key="item">{{ item }}</p></div>`
     }
 
     var app = Vue.createApp(appOptions)
