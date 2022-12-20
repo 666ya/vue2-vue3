@@ -14,30 +14,51 @@
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
+    // var str = 'abzzzzzz'
+    // var patt = /\w\w\w/
+    // var result = patt.exec(str)
+    // console.log(result)
+    const CustomInput = {
+        props: ['firstName', 'lastName', 'firstNameModifiers'],
+        mounted() {
+            console.log(this.firstNameModifiers)
+        },
+        template: `<input :value="firstName" @input="$emit('update:firstName', $event.target.value)"/>
+                    <input :value="lastName" @input="$emit('update:lastName', $event.target.value)"/>`
+    }
     var appOptions = {
         data() {
             return {
                 isShow: true,
-                text: 'aaa'
+                text: 'aaa',
+                first: '',
+                last: ''
             }
         },
-        directives: {
-            test(el) {
-                console.log(el)
-            }
+        components: {
+            CustomInput
         },
+        // directives: {
+        //     test(el) {
+        //         console.log(el)
+        //     }
+        // },
         methods: {
-            handleChange(event) {
-                alert('method')
-                console.log(event)
-                // this.isShow = !this.isShow
-            },
-            handleInlineClick() {
-                alert('inline')
-                // console.log(event)
-            },
+            // handleChange(val) {
+            //     this.text = val
+            // }
+            // handleChange(event) {
+            //     alert('method')
+            //     console.log(event)
+            //     // this.isShow = !this.isShow
+            // },
+            // handleInlineClick() {
+            //     alert('inline')
+            //     // console.log(event)
+            // },
         },
-        template: `<label :name="text"></label><input v-model="text"/>`
+        // template: `<input v-model="text"/>`
+        template: `<custom-input v-model:firstName.test.first="first" v-model:last-name="last"/> {{ first }}-{{ last }}`
     }
 
     var app = Vue.createApp(appOptions)
