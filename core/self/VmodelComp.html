@@ -23,16 +23,15 @@
         mounted() {
             console.log(this.firstNameModifiers)
         },
-        template: `<input :value="firstName" @input="$emit('update:firstName', $event.target.value)"/>
-                    <input :value="lastName" @input="$emit('update:lastName', $event.target.value)"/>`
+        template: `<input :value="firstName" @input="$emit('Update:firstName', $event.target.value)"/>`
     }
     var appOptions = {
         data() {
             return {
                 isShow: true,
-                text: 'aaa',
-                first: '',
-                last: ''
+                first: 'test',
+                last: '',
+                modelName: 'fistName'
             }
         },
         components: {
@@ -58,7 +57,7 @@
             // },
         },
         // template: `<input v-model="text"/>`
-        template: `<custom-input v-model:firstName.test.first="first" v-model:last-name="last"/> {{ first }}-{{ last }}`
+        template: `<custom-input v-model:firstName="first" /> {{ first }}`
     }
 
     var app = Vue.createApp(appOptions)
