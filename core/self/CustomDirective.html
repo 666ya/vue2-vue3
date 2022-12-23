@@ -18,13 +18,13 @@
     // var patt = /\w\w\w/
     // var result = patt.exec(str)
     // console.log(result)
-    const CustomInput = {
-        props: ['firstName', 'lastName', 'firstNameModifiers'],
-        mounted() {
-            console.log(this.firstNameModifiers)
-        },
-        template: `<input :value="firstName" @input="$emit('Update:firstName', $event.target.value)"/>`
-    }
+    // const CustomInput = {
+    //     props: ['firstName', 'lastName', 'firstNameModifiers'],
+    //     mounted() {
+    //         console.log(this.firstNameModifiers)
+    //     },
+    //     template: `<input :value="firstName" @input="$emit('Update:firstName', $event.target.value)"/>`
+    // }
     var appOptions = {
         data() {
             return {
@@ -35,14 +35,14 @@
                 modelName: 'fistName'
             }
         },
-        components: {
-            CustomInput
-        },
-        // directives: {
-        //     test(el) {
-        //         console.log(el)
-        //     }
+        // components: {
+        //     CustomInput
         // },
+        directives: {
+            test(el) {
+                console.log('test')
+            }
+        },
         methods: {
             // handleChange(val) {
             //     this.text = val
@@ -57,11 +57,15 @@
             //     // console.log(event)
             // },
         },
+        template: `<div v-test v-self>自定义指令</div>`
         // template: `<input v-model="inputText"/>`
-        template: `<custom-input v-model:firstName="first" /> {{ first }}`
+        // template: `<custom-input v-model:firstName="first" /> {{ first }}`
     }
 
     var app = Vue.createApp(appOptions)
+    app.directive('self', (el) => {
+        console.log('self')
+    })
     app.mount('#app')
     // appOptions.el = '#app'
     // var app = new Vue(appOptions)
