@@ -14,30 +14,26 @@
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    // var str = 'abzzzzzz'
-    // var patt = /\w\w\w/
-    // var result = patt.exec(str)
-    // console.log(result)
-    // const CustomInput = {
-    //     props: ['firstName', 'lastName', 'firstNameModifiers'],
-    //     mounted() {
-    //         console.log(this.firstNameModifiers)
-    //     },
-    //     template: `<input :value="firstName" @input="$emit('Update:firstName', $event.target.value)"/>`
-    // }
     const CustomComp = {
         data() {
             return {
                 title: 'aaa'
             }
         },
-        // expose: ['title'],
+        created() {
+            console.log('created')
+        },
+        beforeMount() {
+            console.log('beforeMount')
+        },
+        mounted() {
+            console.log('mounted')
+        },
         methods: {
             handleChange() {
                 console.log('aaa')
             }
-        },
-        template: `<div>自定义指令</div><p>aaa</p>`
+        }
     }
     var appOptions = {
         data() {
@@ -46,9 +42,6 @@
         },
         components: {
             CustomComp
-        },
-        mounted() {
-            console.log(this.$refs.custom.handleChange)
         },
         methods: {
             // handleChange(val) {
@@ -64,7 +57,7 @@
             //     // console.log(event)
             // },
         },
-        // template: `<div v-test v-self>自定义指令</div>`
+        // template: `<div>生命周期函数</div>`
         // template: `<input v-model="inputText"/>`
         template: `<custom-comp ref="custom"  />`
     }
