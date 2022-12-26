@@ -25,23 +25,30 @@
     //     },
     //     template: `<input :value="firstName" @input="$emit('Update:firstName', $event.target.value)"/>`
     // }
+    const CustomComp = {
+        data() {
+            return {
+                title: 'aaa'
+            }
+        },
+        expose: ['title'],
+        methods: {
+            handleChange() {
+                console.log('aaa')
+            }
+        },
+        template: `<div>自定义指令</div><p>aaa</p>`
+    }
     var appOptions = {
         data() {
             return {
-                inputText: 'inputText',
-                isShow: true,
-                first: 'test',
-                last: '',
-                modelName: 'fistName'
             }
         },
-        // components: {
-        //     CustomInput
-        // },
-        directives: {
-            test(el) {
-                console.log('test')
-            }
+        components: {
+            CustomComp
+        },
+        mounted() {
+            console.log(this.$refs.custom.handleChange)
         },
         methods: {
             // handleChange(val) {
@@ -57,9 +64,9 @@
             //     // console.log(event)
             // },
         },
-        template: `<div v-test v-self>自定义指令</div>`
+        // template: `<div v-test v-self>自定义指令</div>`
         // template: `<input v-model="inputText"/>`
-        // template: `<custom-input v-model:firstName="first" /> {{ first }}`
+        template: `<custom-comp ref="custom"  />`
     }
 
     var app = Vue.createApp(appOptions)

@@ -15,17 +15,27 @@
 <script src="../../dist/vue.global.js"></script>
 <script>
     const mix = {
-        data() {
-            return {
-                inputText: 'mixdata input',
+        watch: {
+            inputText(value) {
+                console.log('2222')
             }
-        }
+        },
+        // data() {
+        //     return {
+        //         inputText: 'mixdata input',
+        //     }
+        // }
     }
     var appOptions = {
         mixins: [mix],
         data() {
             return {
-                inputText: 'data input',
+                inputText: 'merge',
+            }
+        },
+        watch: {
+            inputText(value) {
+                console.log('1111')
             }
         },
         template: `<input v-model="inputText"/>`
