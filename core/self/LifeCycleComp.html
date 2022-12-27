@@ -28,20 +28,47 @@
         },
         mounted() {
             console.log('mounted')
+
+        },
+        beforeUpdate() {
+            console.log('beforeUpdate')
+        },
+        updated() {
+            console.log('updated')
         },
         methods: {
             handleChange() {
                 console.log('aaa')
             }
-        }
+        },
+        template: `<div>生命周期函数</div>`
     }
     var appOptions = {
         data() {
             return {
+                title: 'p'
             }
         },
         components: {
             CustomComp
+        },
+        created() {
+            console.log('pcreated')
+        },
+        beforeMount() {
+            console.log('pbeforeMount')
+        },
+        mounted() {
+            console.log('pmounted')
+            setTimeout(() => {
+                this.title = 'title修改'
+            }, 2000);
+        },
+        beforeUpdate() {
+            console.log('pbeforeUpdate')
+        },
+        updated() {
+            console.log('pupdated')
         },
         methods: {
             // handleChange(val) {
@@ -59,7 +86,7 @@
         },
         // template: `<div>生命周期函数</div>`
         // template: `<input v-model="inputText"/>`
-        template: `<custom-comp ref="custom"  />`
+        template: `<custom-comp ref="custom" :title="title"  />`
     }
 
     var app = Vue.createApp(appOptions)
