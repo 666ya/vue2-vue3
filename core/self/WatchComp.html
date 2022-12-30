@@ -19,21 +19,29 @@
     let endTime = 0
     var appOptions = {
         setup() {
+            console.log('setup')
             const count = ref(2)
             const value = ref(1)
             let startTime = new Date().getTime()
             watch(count, (val) => {
+                console.log('count')
+                console.log(val)
+            })
+            watch(value, (val) => {
+                console.log('value')
                 console.log(val)
             })
             setTimeout(() => {
                 count.value++
+                value.value++
             }, 2000)
             return {
-                value
+                value,
+                count
             }
         },
         // template: `<input v-model="inputText"/>`
-        template: `<div>watch监听器：{{ value }}</div>`
+        template: `<div>watch监听器：{{ value }}</div><div>watch监听器：{{ count }}</div>`
     }
 
     var app = Vue.createApp(appOptions)
