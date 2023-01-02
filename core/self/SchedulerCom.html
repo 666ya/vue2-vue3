@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { watch, ref, onMounted, h, nextTick, onBeforeUpdate, defineProps } = Vue
+    let isUpdate = false
+    let isChilUpdate = false
+    const ChildComp = {
+        props: ['count'],
+        setup(props) {
+            const immediate = ref(0)
+            const pre = ref(0)
+            const post = ref(0)
+            const sync = ref(0)
+            // watch(immediate, () => {
+            //     console.log('watch立即任务' + immediate.value)
+            // }, {
+            //     immediate: true
+            // })
+            // watch(sync, () => {
+            //     console.log('watch同步任务:' + sync.value)
+            // }, {
+            //     flush: 'sync'
+            // })
+            watch(pre, () => {
+                console.log('子组件watch前置任务' + pre.value)
+                nextTick(() => {
+                    if (isChilUpdate) {
+                        console.log('子组件 nextTick')
+                    }
+                })
+            })
+
+            // watch(post, () => {
+            //     console.log('子组件watch后置任务:' + post.value)
+            // }, {
+            //     flush: 'post'
+            // })
+            // onMounted(() => {
+            //     pre.value++
+            // })
+            setTimeout(() => {
+                pre.value++
+                // pre.value++
+                // sync.value++
+            }, 3000)
+            // onBeforeUpdate(() => {
+            //     nextTick(() => {
+            //         if (isUpdate) {
+            //             console.log('子组件 nextTick')
+            //         }
+            //     })
+            // })
+
+            return {
+                immediate,
+                pre,
+                post,
+                sync
+            }
+        },
+        render() {
+            if (isChilUpdate) {
+                console.log('子组件update当前任务')
+            }
+            if (!isChilUpdate) {
+                isChilUpdate = true
+            }
+            return h('div', [
+                // h('p', `watch监听器立即：${this.immediate}`),
+                h('p', `子组件watch监听器前置：${this.count}`),
+                h('p', `子组件 watch监听器后置：${this.pre}`)
+                // h('p', `watch监听器同步：${this.sync}`),
+                // h('p', `子组件 watch监听器后置：${this.post}`)
+            ])
+        },
+    }
+    var appOptions = {
+        // components: {
+        //     ChildComp
+        // },
+        setup(props) {
+            const immediate = ref(0)
+            const pre = ref(0)
+            const post = ref(0)
+            const sync = ref(0)
+            // watch(immediate, () => {
+            //     console.log('watch立即任务' + immediate.value)
+            // }, {
+            //     immediate: true
+            // })
+            // watch(sync, () => {
+            //     console.log('watch同步任务:' + sync.value)
+            // }, {
+            //     flush: 'sync'
+            // })
+            // watch(pre, () => {
+            //     console.log('watch前置任务' + pre.value)
+            // })
+
+            watch(post, () => {
+                console.log('watch后置任务:' + post.value)
+                if (post.value < 3) {
+                    post.value++
+                }
+            }, {
+                flush: 'post'
+            })
+            // onMounted(() => {
+            //     pre.value++
+            // })
+            setTimeout(() => {
+                post.value++
+                // pre.value++
+                // sync.value++
+            }, 3000)
+            // onBeforeUpdate(() => {
+            //     nextTick(() => {
+            //         if (isUpdate) {
+            //             console.log('nextTick')
+            //         }
+            //     })
+            // })
+
+            return {
+                immediate,
+                pre,
+                post,
+                sync
+            }
+        },
+        render() {
+            if (isUpdate) {
+                console.log('update当前任务')
+            }
+            if (!isUpdate) {
+                isUpdate = true
+            }
+            return h('div', [
+                // h('p', `watch监听器立即：${this.immediate}`),
+                // h('p', `watch监听器前置：${this.pre}`),
+                // h('p', `watch监听器同步：${this.sync}`),
+                h('p', `watch监听器后置：${this.post}`),
+                // h(ChildComp, {
+                //     'count': this.post
+                // })
+            ])
+        },
+        // template: `<div>watch监听器：{{ count }}</div>`
+        // template: `<input v-model="inputText"/>`
+        // template: `<div>watch监听器：{{ value }}</div><div>watch监听器：{{ count }}</div>`
+    }
+
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
