@@ -14,37 +14,98 @@
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
-    const { watch, ref, onMounted, h } = Vue
+    const { watch, ref, onMounted, h, watchEffect, reactive, computed } = Vue
     let isUpdate = false
     var appOptions = {
+        data() {
+            return {
+                obj: {
+                    content: {
+                        count: 1
+                    }
+                }
+            }
+        },
+        watch: {
+            'obj.content.count': {
+                handler: (val) => {
+                    console.log(val)
+                }
+            }
+        },
+        mounted() {
+            setTimeout(() => {
+                // pre.value = 0
+                this.obj.content = {
+                    title: 'aaa'
+                }
+                // obj.content.count++
+                // pre.value++
+                // post.value++
+            }, 1000)
+        },
         setup() {
             const pre = ref(0)
             const post = ref(0)
             const sync = ref(0)
             const isUpdate = ref(false)
-            watch(pre, () => {
-                console.log('前置任务' + pre.value)
-            })
-            watch(sync, () => {
-                console.log('后置任务:' + post.value)
-            }, {
-                flush: 'post'
-            })
-            watch(post, () => {
-                console.log('后置任务:' + post.value)
-            }, {
-                flush: 'post'
-            })
+            // const obj = reactive({
+            //     content: {
+            //         count: 1
+            //     }
+            // })
+            // const computedValue = computed(() => {
+            //     return pre.value
+            // })
+            // watch(() => obj, (newVal, oldVal) => {
+            //     console.log(newVal)
+            //     console.log(newVal === oldVal)
+            // }, {
+            //     deep: true
+            // })
+            // watch([pre, post], ([newPre, newPost], [oldPre, oldPost]) => {
+            //     console.log('oldPre:' + oldPre)
+            //     console.log('newPre:' + newPre)
+            //     console.log('newPost:' + newPost)
+            //     console.log('oldPost:' + oldPost)
+            // }, {
+            //     deep: true
+            // })
+            // watchEffect([pre], {
+            //     onTrack: function (effect) {
+            //         console.log(effect)
+            //     }
+            // })
+            // watch('obj.content.count', (val) => {
+            //     console.log('computed' + val)
+            // })
+            // watch(pre, () => {
+            //     console.log('前置任务' + pre.value)
+            // })
+            // watch(sync, () => {
+            //     console.log('后置任务:' + post.value)
+            // }, {
+            //     flush: 'post'
+            // })
+            // watch(post, () => {
+            //     console.log('后置任务:' + post.value)
+            // }, {
+            //     flush: 'post'
+            // })
             // onMounted(() => {
             //     pre.value++
             // })
-            setTimeout(() => {
-                pre.value++
-                post.value++
-            }, 3000)
+            // setTimeout(() => {
+            //     // pre.value = 0
+            //     obj..title = 'aaa'
+            //     // obj.content.count++
+            //     // pre.value++
+            //     // post.value++
+            // }, 1000)
             return {
                 pre,
-                post
+                post,
+                // obj
             }
         },
         render() {
