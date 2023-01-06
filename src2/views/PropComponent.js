@@ -53,13 +53,20 @@ const BaseRadio = {
 }
 const template = `
     <div>
-    aaa
-    //    <propInput label="姓名" type="text" placeholder="请输入姓名"></propInput>
-    //    <base-input v-model="baseInputValue" @input="showInputValue"></base-input>
+     标题是：{{ 11 }}
     </div>
     `
 export default {
     name: 'PropComponent',
+    props: {
+        // title: [String, Boolean],
+        fn: {
+            type: Object,
+            default: function () {
+                console.log(this)
+            }
+        }
+    },
     components: {
         // PropInput,
         // BaseInput,
