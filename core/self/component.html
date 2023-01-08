@@ -46,7 +46,10 @@
                 parentText: '父组件内容'
             }
         },
-        template: `<div class="parent-box"><p>{{parentText}}</p><child-comp></child-comp></div>`
+        template: `<div class="parent-box">
+            <p>{{parentText}}</p>
+            <app-component></app-component>
+            </div>`
     }
     // 根组件
     var selfMixin = {
@@ -104,6 +107,9 @@
     //             type: true
     //         }
     //     }
+    // })
+    // app.component('AppComponent', {
+    //     template: `全局注册的组件`
     // })
     app.provide('globalMsg', 'global')
     app.mount('#app')

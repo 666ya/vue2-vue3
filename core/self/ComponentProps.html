@@ -20,11 +20,12 @@
 <body>
     <div id="app">
         {{ title }}
-        <com-props :title="title" :count="count"></com-props>
+        <com-props title="title" :count="count"></com-props>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
+    const { inject } = Vue
     var mixinx = {
         props: {
             user: String
@@ -32,24 +33,31 @@
     }
     // 父组件
     var ComProps = {
+        inject: ['foo'],
         props: {
-            count: {
-                type: Number
-            },
-            form: {
-                type: Object,
+            // title: [Boolean, String],
+            fn: {
                 default() {
-                    return {
-                        a: 'aaa'
-                    }
+                    console.log(this)
+                    return this.foo
+                    // return inject('foo', 'defaultMessage')
                 }
-            },
-            propFn: {
-                type: Function,
-                default: () => {
-                    return 'aaa'
-                },
             }
+            // list: [String]
+            // form: {
+            //     type: Object,
+            //     default() {
+            //         return {
+            //             a: 'aaa'
+            //         }
+            //     }
+            // },
+            // propFn: {
+            //     type: Function,
+            //     default: () => {
+            //         return 'aaa'
+            //     },
+            // }
         },
         data() {
             return {
@@ -62,6 +70,7 @@
             }
         },
         mounted() {
+            console.log(this.fn)
             // console.log(this)
             // console.log(this['_'])
             // console.log(this.$props.count++)
@@ -76,11 +85,14 @@
                 console.log('原生事件')
             },
         },
-        template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ count}}</p></div>`
+        template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ 111}} {{ fn }}</p></div>`
     }
     var appOptions = {
         components: {
             ComProps
+        },
+        provide: {
+            foo: 'foo'
         },
         data() {
             return {
@@ -90,10 +102,10 @@
             }
         },
         mounted() {
-            setTimeout(() => {
-                // this.title = 'changed'
-                this.count = 2
-            }, 3000)
+            // setTimeout(() => {
+            //     // this.title = 'changed'
+            //     this.count = 2
+            // }, 3000)
         },
         methods: {
             handleClickFunction() {
@@ -103,11 +115,11 @@
     }
     var app = Vue.createApp(appOptions)
     // 全局混入
-    app.mixin({
-        props: {
-            globalMixin: 'globalMixin'
-        }
-    })
+    // app.mixin({
+    //     props: {
+    //         globalMixin: 'globalMixin'
+    //     }
+    // })
     app.mount('#app')
 </script>
 
