@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent-box {
+            border: 1px solid greenyellow;
+        }
+
+        .child-box {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- <my-component :title="title" :count="count" :test="1"></my-component> -->
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { h } = Vue
+    // 无状态组件
+    function MyComponent(props, context) {
+        console.log(props)
+        console.log(context)
+        return h('div', context.slots.default())
+    }
+    MyComponent.props = ['title']
+    // MyComponent.inheritAttrs = false
+    var appOptions = {
+        components: {
+            MyComponent
+        },
+        data() {
+            return {
+                show: true,
+                title: 'title',
+                count: 1
+            }
+        },
+        render() {
+            return h(MyComponent, {
+                title: this.title,
+                class: 'self-warpper',
+                test: '1',
+                count: this.count
+
+            }, {
+                default() {
+                    return 'slot内容'
+                }
+            })
+        }
+    }
+    var app = Vue.createApp(appOptions)
+    // 全局混入
+    app.mixin({
+        props: {
+            globalMixin: 'globalMixin'
+        }
+    })
+    app.mount('#app')
+</script>
+
+</html>
