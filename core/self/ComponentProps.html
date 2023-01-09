@@ -20,7 +20,7 @@
 <body>
     <div id="app">
         {{ title }}
-        <com-props title="title" :count="count"></com-props>
+        <com-props title="title"></com-props>
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -35,14 +35,18 @@
     var ComProps = {
         inject: ['foo'],
         props: {
-            // title: [Boolean, String],
-            fn: {
-                default() {
-                    console.log(this)
-                    return this.foo
-                    // return inject('foo', 'defaultMessage')
-                }
-            }
+            // title: [String, Boolean],
+            title: {
+                // type: [String, Boolean],
+                type: [Boolean, String],
+            },
+            // fn: {
+            //     default() {
+            //         console.log(this)
+            //         return this.foo
+            //         // return inject('foo', 'defaultMessage')
+            //     }
+            // }
             // list: [String]
             // form: {
             //     type: Object,
@@ -70,7 +74,17 @@
             }
         },
         mounted() {
-            console.log(this.fn)
+            // console.log(this.title)
+            this.parentText = 'aa'
+            const obj = {
+                title: 'a'
+            }
+            const proxyObj = new Proxy(obj, {
+                get(target, key) {
+                    return targe[key]
+                }
+            })
+            console.log(proxyObj)
             // console.log(this)
             // console.log(this['_'])
             // console.log(this.$props.count++)
@@ -85,7 +99,8 @@
                 console.log('原生事件')
             },
         },
-        template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ 111}} {{ fn }}</p></div>`
+        // template: `<div class="parent-box"><p>{{parentText}}</p><p>comonentProps:{{ title}} {{ title }}</p></div>`
+        template: `<div class="parent-box">aaa</div>`
     }
     var appOptions = {
         components: {
@@ -94,13 +109,13 @@
         provide: {
             foo: 'foo'
         },
-        data() {
-            return {
-                show: true,
-                title: 'title',
-                count: 1
-            }
-        },
+        // data() {
+        //     return {
+        //         show: true,
+        //         title: 'title',
+        //         count: 1
+        //     }
+        // },
         mounted() {
             // setTimeout(() => {
             //     // this.title = 'changed'
