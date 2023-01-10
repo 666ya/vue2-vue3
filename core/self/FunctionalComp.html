@@ -30,7 +30,7 @@
     function MyComponent(props, context) {
         console.log(props)
         console.log(context)
-        return h('div', context.slots.default())
+        return h('div', context.slots.default)
     }
     MyComponent.props = ['title']
     // MyComponent.inheritAttrs = false
@@ -52,11 +52,14 @@
                 test: '1',
                 count: this.count
 
-            }, {
-                default() {
-                    return 'slot内容'
+            },
+                'slot',
+                {
+                    default() {
+                        return 'slot内容'
+                    }
                 }
-            })
+            )
         }
     }
     var app = Vue.createApp(appOptions)
