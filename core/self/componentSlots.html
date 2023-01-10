@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent-box {
+            border: 1px solid greenyellow;
+        }
+
+        .child-box {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const { h } = Vue
+    const ComponentSlot = {
+        template: `<div>
+               <slot name="header"></slot>
+                <slot name="footer"></slot>
+            </div>` // namedSlots
+        // template: `<div><slot>fallback content</slot></div>` // fallbackContent
+    }
+    // MyComponent.inheritAttrs = false
+    var appOptions = {
+        components: {
+            ComponentSlot
+        },
+        data() {
+            return {
+                show: true,
+                title: 'title',
+                count: 1
+            }
+        },
+        template: `<component-slot><template #header>aaa</template></component-slot>`
+    }
+    var app = Vue.createApp(appOptions)
+    // 全局混入
+    app.mixin({
+        props: {
+            globalMixin: 'globalMixin'
+        }
+    })
+    app.mount('#app')
+</script>
+
+</html>
