@@ -19,23 +19,48 @@
 
 <body>
     <div id="app">
+        <div v-if="show">
+            <component-slot><template v-slot="slotProps">slot内容: {{ title }} {{ slotProps.test }}</template>
+            </component-slot>
+            <component-new></component-new>
+        </div>
+        <div v-else>aaa</div>
 
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
 <script>
     const { h } = Vue
+    const ComponentNew = {
+        template: `<div><slot>aaa</slot></div>` // fallbackContent
+    }
     const ComponentSlot = {
-        template: `<div>
-               <slot name="header"></slot>
-                <slot name="footer"></slot>
-            </div>` // namedSlots
-        // template: `<div><slot>fallback content</slot></div>` // fallbackContent
+        data() {
+            return {
+                test: 'test'
+            }
+        },
+        // mounted() {
+        //     setTimeout(() => {
+        //         this.test = 'test改变'
+        //     }, 2000)
+        // },
+        // render() {
+        //     return h('div', null, this.$slots.default())
+        // }
+        // template: `<div>
+        //        <slot></slot>
+        //         <slot></slot>
+        //     </div>` 
+
+        // namedSlots
+        template: `<div><slot :test="test">fallback content</slot></div>` // fallbackContent
     }
     // MyComponent.inheritAttrs = false
     var appOptions = {
         components: {
-            ComponentSlot
+            ComponentSlot,
+            ComponentNew
         },
         data() {
             return {
@@ -44,7 +69,12 @@
                 count: 1
             }
         },
-        template: `<component-slot><template #header>aaa</template></component-slot>`
+        mounted() {
+            setTimeout(() => {
+                this.show = false
+            }, 3000)
+        }
+        // template: `<component-slot><template v-slot="slotProps">slot内容: {{ title }} {{ slotProps.test }}</template></component-slot>`
     }
     var app = Vue.createApp(appOptions)
     // 全局混入

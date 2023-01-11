@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent-box {
+            border: 1px solid greenyellow;
+        }
+
+        .child-box {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <com-event @emit-event="handleEmit" @click="handleClick"></com-event>
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<script>
+    const { inject } = Vue
+    var mixinx = {
+        props: {
+            user: String
+        }
+    }
+    // 事件组件
+    var ComEvent = {
+        emits: {
+            click: null,
+            emitEvent: (params) => {
+                if (params == 1) {
+                    return false
+                } else {
+                    return true
+                }
+            }
+        },
+        methods: {
+            handleClick() {
+                this.$emit('emitEvent', 1);
+                // this.$emit('click', 'emit click');
+            }
+        },
+        template: `<div class="parent-box" @click="handleClick">aaa</div>`
+    }
+    var appOptions = {
+        components: {
+            ComEvent
+        },
+        methods: {
+            handleClick(val) {
+                console.log(val + '事件')
+            },
+            handleEmit(val) {
+                console.log(val + '事件')
+            }
+        },
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
