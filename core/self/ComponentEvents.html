@@ -19,7 +19,7 @@
 
 <body>
     <div id="app">
-        <com-event @emit-event="handleEmit" @click="handleClick"></com-event>
+        <!-- <com-event @emitEvent="handleEmit"></com-event> -->
     </div>
 </body>
 <script src="../../dist/vue.global.js"></script>
@@ -33,15 +33,21 @@
     }
     // 事件组件
     var ComEvent = {
-        emits: {
-            click: null,
-            emitEvent: (params) => {
-                if (params == 1) {
-                    return false
-                } else {
-                    return true
-                }
-            }
+        // emits: {
+        //     click: null,
+        //     // emitEvent: (params) => {
+        //     //     if (params == 1) {
+        //     //         return false
+        //     //     } else {
+        //     //         return true
+        //     //     }
+        //     // }
+        // },
+        // props: ['title', 'onEmitEvent'],
+        // emits: ['emitEvent'],
+        mounted() {
+            console.log(this)
+            // console.log(this['_'].emit)
         },
         methods: {
             handleClick() {
@@ -55,6 +61,11 @@
         components: {
             ComEvent
         },
+        data() {
+            return {
+                test: 'test'
+            }
+        },
         methods: {
             handleClick(val) {
                 console.log(val + '事件')
@@ -63,6 +74,7 @@
                 console.log(val + '事件')
             }
         },
+        template: `<com-event v-model="test" @click.prevent="handleEmit"></com-event>`
     }
     var app = Vue.createApp(appOptions)
     app.mount('#app')
