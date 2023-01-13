@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent-box {
+            border: 1px solid greenyellow;
+        }
+
+        .child-box {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+    </div>
+</body>
+<script src="../../dist/vue.global.js"></script>
+<script>
+    const BaseButton = {
+        // inheritAttrs: false,
+        props: ['id'],
+        data() {
+            return {
+                text: ''
+            }
+        },
+        template: `<button>基础按钮</button>`
+    }
+    var MyButton = {
+        // inheritAttrs: false,
+        // props: ['id'],
+        components: {
+            BaseButton
+        },
+        data() {
+            return {
+                text: ''
+            }
+        },
+        template: `<base-button/>`
+    }
+    var appOptions = {
+        inheritAttrs: false,
+        components: {
+            MyButton
+        },
+        methods: {
+            handle() {
+                console.log('handler')
+            }
+        },
+        template: `<my-button id="mybutton" @foo-bar="handle" foo-bar="foo" class="style"></my-button>` //  {  id:'',onFooBar:'', 'foo-bar': '', class:'' }
+    }
+    var app = Vue.createApp(appOptions)
+    app.mount('#app')
+</script>
+
+</html>
