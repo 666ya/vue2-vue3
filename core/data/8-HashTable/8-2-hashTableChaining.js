@@ -82,15 +82,24 @@ class LinkedList {
     }
     removeAt(index) {
         if (index >= 0 && index < this.count) {
+            let current = this.head
             if (index === 0) {
-                this.head = undefined
+                this.head = current.next
             } else {
-                const previous = this.getElementAt(index - 1)
-                const current = this.getElementAt(index)
+                let previous
+                for (let i = 0; i < index; i++) {
+                    previous = current
+                    current = current.next
+                }
                 previous.next = current.next
+                // const previous = this.getElementAt(index - 1)
+                // const current = this.getElementAt(index)
+                // previous.next = current.next
             }
             this.count--
+            return current.element
         }
+        return undefined
     }
     remove(element) {
         const index = this.indexOf(element)
@@ -104,6 +113,9 @@ class LinkedList {
     }
     size() {
         return this.count
+    }
+    getHead() {
+        return this.head
     }
     toString() {
         // if (this.isEmpty()) {
@@ -178,12 +190,62 @@ class HashTableSeparateChaining {
         }
         return false
     }
+    remove(key) {
+        const position = this.hashCode(key)
+        const linkedList = this.table[position]
+        if (linkedList != null && !linkedList.isEmpty()) {
+            let current = linkedList.getHead()
+            while (current != null) {
+                if (current.element.key === key) {
+                    linkedList.remove(current.element)
+                    // 重点
+                    if (linkedList.isEmpty()) {
+                        delete this.table[position]
+                    }
+                    return true
+                }
+                current = current.next
+            }
+        }
+        return false
+    }
+    get(key) {
+        const position = this.hashCode(key)
+        const linkedList = this.table[position]
+        if (linkedList != null && !linkedList.isEmpty()) {
+            let current = linkedList.getHead()
+            while (current != null) {
+                if (current.element.key === key) {
+                    return current.element.value
+                }
+                current = current.next
+            }
+        }
+        return undefined
+        // if (this.table[position] == null) {
+        //     return undefined
+        // }
+        // const linkedList = this.table[position]
+        // let current = linkedList.head
+        // while (current) {
+        //     if (current.element.key === key) {
+        //         return current.element.value
+        //     }
+        //     current = current.next
+        // }
+        // return current
+    }
 }
 
 
 const table = new HashTableSeparateChaining()
 
-table.put('fy', 'fy@qq.com')
-table.put('fy', 'fy@163.com')
+table.put('Jamie', 'Jamie@qq.com')
+table.put('Jamie', 'Jamie@qq.com')
+table.put('Aethelwulf', 'Aethelwulf@163.com')
+
+console.log(table.remove('Jamie'))
+console.log(table.remove('Aethelwulf'))
+
 
 console.log(table)

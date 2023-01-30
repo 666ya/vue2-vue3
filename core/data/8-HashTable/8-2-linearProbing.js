@@ -114,6 +114,9 @@ class LinkedList {
     size() {
         return this.count
     }
+    getHead() {
+        return this.head
+    }
     toString() {
         // if (this.isEmpty()) {
         //     return ''
@@ -138,10 +141,125 @@ class LinkedList {
     }
 }
 
-const link = new LinkedList()
-for (let i = 0; i < 11; i++) {
-    link.push(i)
+function defaultToString(item) {
+    if (item === null) {
+        return 'NULL'
+    } else if (item === undefined) {
+        return 'UNDEFINED'
+    } else if (typeof item === 'string' || item instanceof String) {
+        return `${item}`
+    }
+    return item.toString()
 }
-console.log(link.insert(11, 11))
-console.log(link.indexOf(2))
-console.log(link.toString())
+class ValuePair {
+    constructor(key, value, hash) {
+        this.key = key
+        this.value = value
+        this.hash = hash
+    }
+    toString() {
+        return `[#${this.key}: ${this.value}]`
+    }
+}
+class HashTableSeparateChaining {
+    constructor(toStrFn = defaultToString) {
+        this.toStrFn = toStrFn
+        this.table = {}
+    }
+    loselosrHashCode(key) {
+        if (typeof key === 'number') {
+            return key
+        }
+        const tableKey = this.toStrFn(key)
+        let hash = 0
+        for (let i = 0; i < tableKey.length; i++) {
+            hash += tableKey.charCodeAt(i)
+        }
+        return hash % 37
+    }
+    hashCode(key) {
+        return this.loselosrHashCode(key)
+    }
+    put(key, value) {
+        if (key != null && value != null) {
+            const position = this.hashCode(key)
+            if (this.table[position] == null) {
+                this.table[position] = new ValuePair(key, value, this.hashCode(key))
+            } else {
+                let index = position + 1
+                while (this.table[index] != null) {
+                    index++
+                }
+                this.table[index] = new ValuePair(key, value, this.hashCode(key))
+            }
+            return true
+        }
+        return false
+    }
+    remove(key) {
+        const position = this.hashCode(key)
+        if (this.table[position] != null) {
+            let index = position
+            while (this.table[index] != null && this.table[index].key !== key) {
+                index++
+            }
+            if (this.table[index] != null && this.table[index].key === key) {
+                delete this.table[index]
+                this.verifyRemoveSideEffect(key, index)
+                return true
+            }
+        }
+        return false
+    }
+    verifyRemoveSideEffect(key, removePosition) {
+        const hash = this.hashCode(key)
+        let index = removePosition + 1
+        while (this.table[index] != null) {
+            let postHash = this.hashCode(this.table[index].key)
+            if (postHash <= hash || postHash <= removePosition) {
+                this.table[removePosition] = this.table[index]
+                delete this.table[index]
+                removePosition = index
+            }
+            index++
+        }
+    }
+    get(key) {
+        const position = this.hashCode(key)
+        if (this.table[position] != null) {
+            if (this.table[position].key === key) {
+                return this.table[position].value
+            }
+            let index = position + 1
+            while (this.table[index] != null && this.table[index].key !== key) {
+                // if (this.table[index].key === key) {
+                //     return this.table[index].value
+                // }
+                index++
+            }
+            if (this.table[index] != null && this.table[index].key === key) {
+                return this.table[index].value
+            }
+        }
+        return undefined
+    }
+}
+
+
+const table = new HashTableSeparateChaining()
+
+table.put('Ygritte', 'Ygritte@qq.com')
+table.put('Jonathan', 'Jonathan@163.com')
+table.put('Jamie', 'Jamie@163.com')
+table.put('Jack', 'Jack@163.com')
+table.put('Jasmine', 'Jasmine@163.com')
+table.put('Jake', 'Jake@163.com')
+table.put('Nathan', 'Nathan@163.com')
+table.put('Athelstan', 'Athelstan@163.com')
+table.put('Sue', 'Sue@163.com')
+table.put('Aethelwulf', 'Aethelwulf@163.com')
+table.put('Sargeras', 'Sargeras@163.com')
+
+
+table.remove('Jonathan')
+console.log(table)
