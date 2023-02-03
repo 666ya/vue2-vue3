@@ -135,6 +135,13 @@ class BinarySearchTree {
     }
 }
 
+const BalanceFator = {
+    UNBALANCED_RIGHT: 1,
+    SLIGHTLY_UNBALANCED_RIGHT: 2,
+    BALANCED: 3,
+    SLIGHTLY_UNBALANCED_LEFT: 4,
+    UNBALANCED_LEFT: 5
+}
 class AVLTree extends BinarySearchTree {
     constructor(compareFn = defaultCompare) {
         super(compareFn)
@@ -147,13 +154,74 @@ class AVLTree extends BinarySearchTree {
         }
         return Math.max(this.getNodeHeight(node.left), this.getNodeHeight(node.right)) + 1
     }
+    getBalanceFator(node) {
+        const heightDifference = this.getNodeHeight(node.left) - this.getNodeHeight(node.right)
+        switch (heightDifference) {
+            case -2:
+                return BalanceFator.UNBALANCED_RIGHT
+            case -1:
+                return BalanceFator.SLIGHTLY_UNBALANCED_RIGHT
+            case 1:
+                return BalanceFator.SLIGHTLY_UNBALANCED_LEFT
+            case 2:
+                return BalanceFator.UNBALANCED_LEFT
+            default:
+                return BalanceFator.BALANCED
+        }
+    }
+    insert(key) {
+        this.root = this.insertNode(this.root, key)
+    }
+    insertNode(node, key) {
+        if (node == null) {
+            return new Node(key);
+        } else if (this.compareFn(key, node.key) === Compare.LESS_THAN) {
+            node.left = this.insertNode(node.left, key)
+        } else if (this.compareFn(key, node.key) === Compare.BIGGER_THAN) {
+            node.right = this.insertNode(node.right, key)
+        } else {
+            return node
+        }
+
+        const balanceFator = this.getBalanceFator(node)
+        if (balanceFator === BalanceFator.UNBALANCED_LEFT) {
+            if (this.compareFn(key, node.left.key) === Compare.LESS_THAN) {
+                node = this.rotationLL(node)
+            }
+        } else if (balanceFator === BalanceFator.UNBALANCED_RIGHT) {
+            if (this.compareFn(key, node.right.key) === Compare.BIGGER_THAN) {
+                node = this.rotationRR(node)
+            }
+        }
+        return node
+    }
+
+
+    rotationLL(node) {
+        const temp = node.left
+        node.left = temp.right
+        temp.right = node
+        return temp
+    }
+    rotationRR(node) {
+        const temp = node.right
+        node.right = temp.left
+        temp.left = node
+        return temp
+    }
 }
 const tree = new AVLTree()
-tree.inert(11)
-tree.inert(7)
-// tree.inert(15)
+tree.insert(11)
+tree.insert(15)
+tree.insert(7)
+tree.insert(5)
+tree.insert(8)
+tree.insert(3)
+// tree.insert(50)
+// tree.insert(30)
+// tree.insert(70)
+// tree.inert(10)
 // tree.inert(5)
-// tree.inert(3)
 // tree.inert(9)
 // tree.inert(8)
 // tree.inert(10)
@@ -170,5 +238,5 @@ tree.inert(7)
 // console.log(tree.min())
 // console.log(tree.max())
 // console.log(tree.search(25))
-console.log(tree.getNodeHeight(tree.root))
+// console.log(tree.getNodeHeight(tree.root))
 console.log(tree)
