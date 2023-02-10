@@ -164,32 +164,32 @@ const initializeColor = vertices => {
 
 // depthFirstSearch
 
-const depthFirstSearch = (graph, callback) => {
-    const vertices = graph.getVertices()
-    const adjList = graph.getAdjList()
-    const colors = initializeColor(vertices)
-    const depthFirstSearchVisit = (u, colors, adjList, callback) => {
-        colors[u] = Colors.GREY
-        if (callback) {
-            callback(u)
-        }
-        const neighbors = adjList.get(u)
-        for (let i = 0; i < neighbors.length; i++) {
-            const w = neighbors[i]
-            if (colors[w] === Colors.WHITE) {
-                depthFirstSearchVisit(w, colors, adjList, callback)
-            }
-        }
-        colors[u] = Colors.BLACK
-    }
-    for (let i = 0; i < myVertices.length; i++) {
-        const u = myVertices[i]
-        if (colors[u] === Colors.WHITE) {
-            depthFirstSearchVisit(u, colors, adjList, callback)
-        }
-    }
-}
-// const printValue = u => console.log(`Visited vertex: ${u}`)
+// const depthFirstSearch = (graph, callback) => {
+//     const vertices = graph.getVertices()
+//     const adjList = graph.getAdjList()
+//     const colors = initializeColor(vertices)
+//     const depthFirstSearchVisit = (u, colors, adjList, callback) => {
+//         colors[u] = Colors.GREY
+//         if (callback) {
+//             callback(u)
+//         }
+//         const neighbors = adjList.get(u)
+//         for (let i = 0; i < neighbors.length; i++) {
+//             const w = neighbors[i]
+//             if (colors[w] === Colors.WHITE) {
+//                 depthFirstSearchVisit(w, colors, adjList, callback)
+//             }
+//         }
+//         colors[u] = Colors.BLACK
+//     }
+//     for (let i = 0; i < myVertices.length; i++) {
+//         const u = myVertices[i]
+//         if (colors[u] === Colors.WHITE) {
+//             depthFirstSearchVisit(u, colors, adjList, callback)
+//         }
+//     }
+// }
+// // const printValue = u => console.log(`Visited vertex: ${u}`)
 // depthFirstSearch(graph, printValue)
 
 
@@ -197,22 +197,22 @@ const depthFirstSearch = (graph, callback) => {
 const DFS = (graph) => {
     const vertices = graph.getVertices()
     const adjList = graph.getAdjList()
-    const colors = initializeColor(vertices)
+    const color = initializeColor(vertices)
     const d = {}
     const f = {}
     const p = {}
     const time = {
         count: 0
     }
-    for (let i = 0; i < myVertices.length; i++) {
-        d[myVertices[i]] = 0
-        f[myVertices[i]] = 0
-        p[myVertices[i]] = null
+    for (let i = 0; i < vertices.length; i++) {
+        d[vertices[i]] = 0
+        f[vertices[i]] = 0
+        p[vertices[i]] = null
     }
-    for (let i = 0; i < myVertices.length; i++) {
-        const u = myVertices[i]
-        if (colors[u] === Colors.WHITE) {
-            DFSVisit(u, colors, d, f, p, time, adjList)
+    for (let i = 0; i < vertices.length; i++) {
+        const u = vertices[i]
+        if (color[u] === Colors.WHITE) {
+            DFSVisit(u, color, d, f, p, time, adjList)
         }
     }
     return {
@@ -221,18 +221,18 @@ const DFS = (graph) => {
         p
     }
 }
-const DFSVisit = (u, colors, d, f, p, time, adjList) => {
-    colors[u] = Colors.GREY
+const DFSVisit = (u, color, d, f, p, time, adjList) => {
+    color[u] = Colors.GREY
     d[u] = ++time.count
     const neighbors = adjList.get(u)
     for (let i = 0; i < neighbors.length; i++) {
         const w = neighbors[i]
-        if (colors[w] === Colors.WHITE) {
+        if (color[w] === Colors.WHITE) {
             p[w] = u
-            DFSVisit(w, colors, d, f, p, time, adjList)
+            DFSVisit(w, color, d, f, p, time, adjList)
         }
     }
-    colors[u] = Colors.BLACK
+    color[u] = Colors.BLACK
     f[u] = ++time.count
 }
 

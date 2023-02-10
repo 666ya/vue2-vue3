@@ -132,7 +132,7 @@ class Graph {
     }
 }
 
-const graph = new Graph()
+const graph = new Graph(true)
 const myVertices = ['A', 'B', 'C', 'D', 'E', 'F']
 for (let i = 0; i < myVertices.length; i++) {
     graph.addVertex(myVertices[i])
@@ -143,7 +143,7 @@ graph.addEdge('B', 'D')
 graph.addEdge('B', 'E')
 graph.addEdge('C', 'F')
 graph.addEdge('F', 'E')
-
+console.log(graph.toString())
 
 const Colors = {
     WHITE: 0,
@@ -160,20 +160,6 @@ const initializeColor = vertices => {
 
 
 // 应用
-const DFSVisit = (u, color, d, f, p, time, adjList) => {
-    color[u] = Colors.GREY
-    d[u] = ++time.count
-    const neighbors = adjList.get(u)
-    for (let i = 0; i < neighbors.length; i++) {
-        const w = neighbors[i]
-        if (color[w] === Colors.WHITE) {
-            p[w] = u
-            DFSVisit(w, color, d, f, p, time, adjList)
-        }
-    }
-    color[u] = Colors.BLACK
-    f[u] = ++time.count
-}
 const DFS = (graph) => {
     const vertices = graph.getVertices()
     const adjList = graph.getAdjList()
@@ -184,14 +170,28 @@ const DFS = (graph) => {
     const time = {
         count: 0
     }
+    const DFSVisit = (u, color, d, f, p, time, adjList) => {
+        color[u] = Colors.GREY
+        d[u] = ++time.count
+        const neighbors = adjList.get(u)
+        for (let i = 0; i < neighbors.length; i++) {
+            const w = neighbors[i]
+            if (color[w] === Colors.WHITE) {
+                p[w] = u
+                DFSVisit(w, color, d, f, p, time, adjList)
+            }
+        }
+        color[u] = Colors.BLACK
+        f[u] = ++time.count
+    }
 
     for (let i = 0; i < vertices.length; i++) {
-        d[myVertices[i]] = 0
-        f[myVertices[i]] = 0
-        p[myVertices[i]] = null
+        d[vertices[i]] = 0
+        f[vertices[i]] = 0
+        p[vertices[i]] = null
     }
     for (let i = 0; i < vertices.length; i++) {
-        const u = myVertices[i]
+        const u = vertices[i]
         if (color[u] === Colors.WHITE) {
             DFSVisit(u, color, d, f, p, time, adjList)
         }
@@ -204,9 +204,8 @@ const DFS = (graph) => {
 }
 
 const time = DFS(graph)
+console.log(time)
 const fTime = time.f
-
-console.log(fTime)
 let s = ''
 for (let i = 0; i < myVertices.length; i++) {
     let max = 0
@@ -217,7 +216,12 @@ for (let i = 0; i < myVertices.length; i++) {
             maxName = myVertices[j]
         }
     }
-    s += '-' + maxName
+    if (i === 0) {
+        s += maxName
+    } else {
+        s += '-' + maxName
+    }
+
     delete fTime[maxName]
 }
 console.log(s)
