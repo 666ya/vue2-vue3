@@ -113,6 +113,7 @@
     import SlotComponent from './src2/views/SlotComponent.js'
     import MixinComponent from './src2/views/MixinComponent.js'
     import AppApiCom from './src3/views/AppApiCom.js'
+    import FunctionalCom from './src2/views/FunctionalCom.js'
 
     // 非兼容变更
     import DiffComponent from './diffcomponent/DiffComponent.js'
@@ -203,15 +204,15 @@
                     //         },
                     //     ],
                     // },
-                    // {
-                    //     title: "事件处理",
-                    //     component: EventComponent,
-                    //     children: [
-                    //         {
-                    //             name: "多时间处理器",
-                    //         },
-                    //     ],
-                    // },
+                    {
+                        title: "事件处理",
+                        component: EventComponent,
+                        children: [
+                            {
+                                name: "多时间处理器",
+                            },
+                        ],
+                    },
                     {
                         title: "title",
                         component: PropComponent,
@@ -220,6 +221,10 @@
                         //         name: "非Prop的Attribute",
                         //     },
                         // ],
+                    },
+                    {
+                        title: "无状态组件",
+                        component: FunctionalCom,
                     },
                     //  {
                     //     title: "可复用性&组合",

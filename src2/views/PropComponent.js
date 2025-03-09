@@ -53,11 +53,12 @@ const BaseRadio = {
 }
 const template = `
     <div>
-     标题是：{{ 11 }}
+     标题是：{{ 11 }}  (11)
     </div>
     `
 export default {
     name: 'PropComponent',
+    delimiters: [ "{{", "}}"],
     props: {
         // title: [String, Boolean],
         fn: {
